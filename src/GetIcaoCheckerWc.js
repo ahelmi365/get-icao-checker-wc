@@ -1588,7 +1588,7 @@ export class GetIcaoCheckerWc extends LitElement {
   constructor() {
     super();
     console.log(this);
-    console.log("constructor v 1.1.10");
+    console.log("constructor version 1.2.1");
     this.header = "Hey there";
     this.counter = 5;
 
