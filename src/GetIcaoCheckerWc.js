@@ -1589,12 +1589,10 @@ export class GetIcaoCheckerWc extends LitElement {
   `;
 
   static properties = {
-    header: { type: String },
-    counter: { type: Number },
-
     isICAOWC: { type: Boolean },
     openModalElmId: { type: String },
     savedImageElmId: { type: String },
+    getImgSrc: { type: (src) => console.log(src) },
   };
 
   constructor() {
@@ -1607,14 +1605,17 @@ export class GetIcaoCheckerWc extends LitElement {
     this.isICAOWC = false;
     this.openModalElmId = "open-icao-modal";
     this.savedImageElmId = "cao-result-image";
+    this.setSavedImgSrc = "getImgSrc";
     // this.attachShadow({ mode: "open" });
   }
 
   async connectedCallback() {
     console.log("connectedCallback v 1.1.");
+    this.setSavedImgSrc("src/fake/path/to/fake/image from connectedCallback()");
     console.log(this.isICAOWC);
     console.log(this.openModalElmId);
     console.log(this.savedImageElmId);
+    console.log(this.setSavedImgSrc);
 
     await loadBootstrap(this).then(() => {
       initICAOModal(this);
@@ -1682,7 +1683,11 @@ export class GetIcaoCheckerWc extends LitElement {
     if (innerModal) {
       innerModal.addEventListener("shown.bs.modal", async () => {
         const { onICAOScriptLoad } = await import("./scripts/script.js");
-        onICAOScriptLoad(this.isICAOWC, this.savedImageElm);
+        onICAOScriptLoad(
+          this.isICAOWC,
+          this.savedImageElm,
+          this.setSavedImgSrc
+        );
       });
     }
     if (innerModal) {
@@ -1725,16 +1730,13 @@ export class GetIcaoCheckerWc extends LitElement {
     // loadScript("./utils.js");
     // loadScript("./script.js");
   }
-  __increment() {
-    this.counter += 1;
-  }
 
   render() {
     return html`
-      <h2>${this.header} Nr. ${this.counter}!</h2>
+      <!-- <h2>${this.header} Nr. ${this.counter}!</h2>
       <button @click=${this.__increment} class="btn btn-primary">
         increment v 1.1.6
-      </button>
+      </button> -->
       <!-- <div id="icao-modal-start-container">${modalInnerHtml}</div> -->
     `;
   }

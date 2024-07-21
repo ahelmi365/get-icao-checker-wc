@@ -32,14 +32,20 @@
 
       const header = "Hello owc World!";
 
+      const setSavedImgSrc = (src) => {
+        console.log("hii from setSavedImgSrc()");
+        console.log({ src });
+      };
+
       render(
         html`
           <get-icao-checker-wc
             .header=${header}
             .counter=${25}
-            .isICAOWC=${true}
+            .isICAOWC=${false}
             .openModalElmId=${"test"}
             .savedImageElmId=${"test"}
+            // .setSavedImgSrc=${setSavedImgSrc}
           >
             some light-dom
           </get-icao-checker-wc>
