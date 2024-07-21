@@ -1595,16 +1595,15 @@ export class GetIcaoCheckerWc extends LitElement {
     this.isICAOWC = false;
     this.openModalElmId = "open-icao-modal";
     this.savedImageElmId = "cao-result-image";
-    this.setSavedImgSrc = (src) => console.log({ src });
+    this.getImgSrc = (src) => console.log({ src });
     // this.attachShadow({ mode: "open" });
   }
 
   async connectedCallback() {
-    this.setSavedImgSrc("src/fake/path/to/fake/image from connectedCallback()");
     console.log(this.isICAOWC);
     console.log(this.openModalElmId);
     console.log(this.savedImageElmId);
-    console.log(this.setSavedImgSrc);
+    console.log(this.getImgSrc);
 
     await loadBootstrap(this).then(() => {
       initICAOModal(this);
@@ -1672,11 +1671,7 @@ export class GetIcaoCheckerWc extends LitElement {
     if (innerModal) {
       innerModal.addEventListener("shown.bs.modal", async () => {
         const { onICAOScriptLoad } = await import("./scripts/script.js");
-        onICAOScriptLoad(
-          this.isICAOWC,
-          this.savedImageElm,
-          this.setSavedImgSrc
-        );
+        onICAOScriptLoad(this.isICAOWC, this.savedImageElm, this.getImgSrc);
       });
     }
     if (innerModal) {

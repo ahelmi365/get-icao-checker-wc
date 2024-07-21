@@ -764,14 +764,15 @@ export async function CaptureImage() {
 }
 
 // SaveCaptureedImg
-export function SaveCaptureedImg(savedImageElm, setSavedImgSrc) {
+export function SaveCaptureedImg(savedImageElm, getImgSrc) {
   StopCameraIndicatorInBrowser();
   ClearICAOServiceThread();
   const croppedImage = document.getElementById("cropped");
   // updatePhotoImage(croppedImage.src);
   savedImageElm.src = croppedImage.src;
-  if (typeof setSavedImgSrc === "function") {
-    setSavedImgSrc(croppedImage.src);
+  console.log({ getImgSrc });
+  if (typeof getImgSrc === "function") {
+    getImgSrc(croppedImage.src);
   }
   stopVideoStream();
   croppedImage.style.display = "none";
