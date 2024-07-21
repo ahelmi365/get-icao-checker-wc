@@ -1,6 +1,5 @@
 import { html, css, LitElement } from "lit";
 import { StopWorker } from "./scripts/ICAOWorker.js";
-import { version } from "../package.json";
 // #region Common JS
 export function removeScript(src) {
   const scriptToRemove = document.querySelector(`script[src="${src}"]`);
@@ -1579,36 +1578,25 @@ p.icao-reconnect-label {
 // #endregion
 
 export class GetIcaoCheckerWc extends LitElement {
-  static styles = css`
-    /* @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"); */
-
-    :host {
-      display: block;
-      padding: 25px;
-      color: var(--get-icao-checker-wc-text-color, #000);
-    }
-  `;
-
   static properties = {
     isICAOWC: { type: Boolean },
     openModalElmId: { type: String },
     savedImageElmId: { type: String },
-    getImgSrc: { type: (src) => console.log(src) },
+    getImgSrc: { type: Function },
   };
 
   constructor() {
     super();
     console.log(this);
-    console.log("constructor v 1.1.9");
+    console.log("constructor v 1.1.10");
     this.header = "Hey there";
     this.counter = 5;
 
     this.isICAOWC = false;
     this.openModalElmId = "open-icao-modal";
     this.savedImageElmId = "cao-result-image";
-    this.setSavedImgSrc = "getImgSrc";
+    this.setSavedImgSrc = (src) => console.log({ src });
     // this.attachShadow({ mode: "open" });
-    console.log({ version });
   }
 
   async connectedCallback() {
@@ -1731,6 +1719,15 @@ export class GetIcaoCheckerWc extends LitElement {
     // loadScript("./utils.js");
     // loadScript("./script.js");
   }
+  static styles = css`
+    /* @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"); */
+
+    :host {
+      display: block;
+      padding: 25px;
+      color: var(--get-icao-checker-wc-text-color, #000);
+    }
+  `;
 
   render() {
     return html`
