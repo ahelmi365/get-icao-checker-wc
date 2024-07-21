@@ -1,5 +1,6 @@
 import { html, css, LitElement } from "lit";
 import { StopWorker } from "./scripts/ICAOWorker.js";
+import { version } from "../package.json";
 // #region Common JS
 export function removeScript(src) {
   const scriptToRemove = document.querySelector(`script[src="${src}"]`);
@@ -1598,7 +1599,7 @@ export class GetIcaoCheckerWc extends LitElement {
   constructor() {
     super();
     console.log(this);
-    console.log("constructor v 1.1.7");
+    console.log("constructor v 1.1.9");
     this.header = "Hey there";
     this.counter = 5;
 
@@ -1607,10 +1608,10 @@ export class GetIcaoCheckerWc extends LitElement {
     this.savedImageElmId = "cao-result-image";
     this.setSavedImgSrc = "getImgSrc";
     // this.attachShadow({ mode: "open" });
+    console.log({ version });
   }
 
   async connectedCallback() {
-    console.log("connectedCallback v 1.1.");
     this.setSavedImgSrc("src/fake/path/to/fake/image from connectedCallback()");
     console.log(this.isICAOWC);
     console.log(this.openModalElmId);
