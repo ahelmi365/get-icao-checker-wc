@@ -1589,8 +1589,6 @@ export class GetIcaoCheckerWc extends LitElement {
     super();
     console.log(this);
     console.log("constructor version 1.2.2");
-    this.header = "Hey there";
-    this.counter = 5;
 
     this.isICAOWC = false;
     this.openModalElmId = "open-icao-modal";
@@ -1727,10 +1725,6 @@ export class GetIcaoCheckerWc extends LitElement {
 
   render() {
     return html`
-      <!-- <h2>${this.header} Nr. ${this.counter}!</h2>
-      <button @click=${this.__increment} class="btn btn-primary">
-        increment v 1.1.6
-      </button> -->
       <!-- <div id="icao-modal-start-container">${modalInnerHtml}</div> -->
     `;
   }
