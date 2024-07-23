@@ -1588,7 +1588,7 @@ export class GetIcaoCheckerWc extends LitElement {
   constructor() {
     super();
     console.log(this);
-    console.log("constructor version 1.2.1");
+    console.log("constructor version 1.2.2");
     this.header = "Hey there";
     this.counter = 5;
 
@@ -1600,6 +1600,7 @@ export class GetIcaoCheckerWc extends LitElement {
   }
 
   async connectedCallback() {
+    console.log(this.shadowRoot);
     console.log(this.isICAOWC);
     console.log(this.openModalElmId);
     console.log(this.savedImageElmId);
