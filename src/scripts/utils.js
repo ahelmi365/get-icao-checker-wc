@@ -122,6 +122,7 @@ export let videoRef;
 
 export const onLoadUtils = () => {
   if (utilsCommonVars.isICAO) {
+    console.log({ isICAO });
     leftFeatures.classList.add("flex-column-space-around-center");
     leftFeatures.classList.remove("d-none");
     rightFeatures.classList.add("flex-column-space-around-center");

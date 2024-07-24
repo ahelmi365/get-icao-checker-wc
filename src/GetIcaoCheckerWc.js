@@ -96,6 +96,7 @@ const initICAOModal = (shadwoRoot) => {
       background-color: transparent;
       width: 100%;
       height: 100%;
+      display:none
     }
 
     .icao-modal-container .modal-content {
@@ -686,6 +687,23 @@ p.icao-reconnect-label {
     #result-image {
       border-radius: 10px;
     }
+
+      .modal {
+        display: none; /* Initially hidden */
+        position: fixed; /* Stays in place when scrolling */
+        z-index: 1000; /* Ensures the modal appears on top of other content */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto; /* Allows scrolling if content overflows */
+        background-color: rgba(0, 0, 0, 0.4); /* Overlay background */
+  }
+
+  .modal.show { /* Add .show class to display the modal */
+    display: block;
+  }
+
   </style>
 
   <div
@@ -1604,10 +1622,11 @@ export class GetIcaoCheckerWc extends LitElement {
     console.log(this.savedImageElmId);
     console.log(this.getImgSrc);
 
-    await loadBootstrap(this).then(() => {
-      initICAOModal(this);
-    });
+    // await loadBootstrap(this).then(() => {
+    //   initICAOModal(this);
+    // });
 
+    initICAOModal(this);
     try {
       const openModalBtn = document.getElementById(
         this.openModalBtnId ? this.openModalBtnId : "open-icao-modal"
@@ -1648,10 +1667,12 @@ export class GetIcaoCheckerWc extends LitElement {
     }
   }
 
-  openModalAndoadIcaoScripts() {
-    this.openModal(this);
-    // loadScript("./scripts/script.js");
-    // loadStyle("./styles/styles.css");
+  async openModalAndoadIcaoScripts() {
+    console.log(this.shadowRoot);
+    document.querySelector(".icao-modal-container").classList.add("show");
+    // this.openModal(this);
+    const { onICAOScriptLoad } = await import("./scripts/script.js");
+    onICAOScriptLoad(this.isICAOWC, this.savedImageElm, this.getImgSrc);
   }
   async openModal() {
     // Remove existing script element if it exists
@@ -1704,14 +1725,7 @@ export class GetIcaoCheckerWc extends LitElement {
     if (innerModal) {
       const bootstrapModal = new bootstrap.Modal(innerModal);
       bootstrapModal.show();
-      // const { onICAOScriptLoad } = await import("./script.js");
-      // onICAOScriptLoad();
     }
-
-    // load icao scripts()
-
-    // loadScript("./utils.js");
-    // loadScript("./script.js");
   }
   static styles = css`
     /* @import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"); */

@@ -6,12 +6,12 @@
 
 // #region Bootstrap tootltip setup
 // Enable bootstrap tooltip
-const tooltipTriggerList = document.querySelectorAll(
-  '[data-bs-toggle="tooltip"]'
-);
-const tooltipList = [...tooltipTriggerList].map(
-  (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
-);
+// const tooltipTriggerList = document.querySelectorAll(
+//   '[data-bs-toggle="tooltip"]'
+// );
+// const tooltipList = [...tooltipTriggerList].map(
+//   (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+// );
 // #endregion
 // #region UseEffects
 // ---------------- apply effects ----------------------
@@ -176,7 +176,7 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
     //   "none";
     // removeScript("./scripts/script.js");
     // removeStyleSheet("./styles/styles.css");
-
+    document.querySelector(".icao-modal-container").classList.remove("show");
     clearInterval(FaceDetectedRectangleDrawingThread);
   });
 
