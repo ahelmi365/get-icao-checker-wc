@@ -6,7 +6,7 @@
 
 // #region Bootstrap tootltip setup
 // Enable bootstrap tooltip
-// const tooltipTriggerList = document.querySelectorAll(
+// const tooltipTriggerList = icaoAppWC.shadowRoot.querySelectorAll(
 //   '[data-bs-toggle="tooltip"]'
 // );
 // const tooltipList = [...tooltipTriggerList].map(
@@ -35,7 +35,6 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
     handleChangeInAvaliableCameras,
     handleFullScreenChange,
     isCheckingICAOServiceThread,
-    isICAO,
     reestCashedArray,
     setCachedCamera,
     setIsCheckingICAOServiceThread,
@@ -47,15 +46,18 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
     utils,
   } = await import("./utils.js");
 
-  isICAO = isICAOWC;
-  utilsCommonVars.isICAO = isICAOWC;
+  utilsCommonVars.isICAO = icaoAppWC.isICAO;
   onLoadUtils();
 
   reestCashedArray();
   setIsCheckingICAOServiceThread(true);
-  document.addEventListener("fullscreenchange", handleFullScreenChange);
-  // document.addEventListener("keydown", handleKeyDown);
-  if (isICAO) {
+  console.log({ isCheckingICAOServiceThread });
+  icaoAppWC.shadowRoot.addEventListener(
+    "fullscreenchange",
+    handleFullScreenChange
+  );
+  // icaoAppWC.shadowRoot.addEventListener("keydown", handleKeyDown);
+  if (icaoAppWC.isICAO) {
     try {
       RetrieveScripts(EnrolmentDevices.WebCam.Scripts);
     } catch (error) {
@@ -66,14 +68,16 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
   const selecetedCameraIDFromLocalStorage = getSelectedCameraFromLocalStorage();
   setCachedCamera(selecetedCameraIDFromLocalStorage);
   enumerateDevices(selecetedCameraIDFromLocalStorage);
-
-  if (isCheckingICAOServiceThread && isICAO) {
+  console.log("inside onICAOScriptLoad()");
+  console.log(isCheckingICAOServiceThread && icaoAppWC.isICAO);
+  if (isCheckingICAOServiceThread && icaoAppWC.isICAO) {
     ClearICAOServiceThread(utils.CheckingICAOServiceThread);
     utils.CheckingICAOServiceThread = setInterval(() => {
-      if (isCheckingICAOServiceThread && isICAO) {
+      if (isCheckingICAOServiceThread && icaoAppWC.isICAO) {
         GetConnectionState().then((ConnectionState) => {
           setLableMessageForICAO(ConnectionState);
-          const lblMessageError = document.getElementById("lblMessageForICAO");
+          const lblMessageError =
+            icaoAppWC.shadowRoot.getElementById("lblMessageForICAO");
           lblMessageError
             ? (lblMessageError.innerText = ConnectionState)
             : null;
@@ -88,22 +92,33 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
 
   // #endregion
   // #region HTML elements
-  const modalCloseBtn = document.getElementById("top-row-close-icon");
-  const croppedImage = document.getElementById("cropped");
+  const modalCloseBtn =
+    icaoAppWC.shadowRoot.getElementById("top-row-close-icon");
+  const croppedImage = icaoAppWC.shadowRoot.getElementById("cropped");
   croppedImage.src = "";
   croppedImage.style.display = "none";
-  const connectCameraBtn = document.getElementById("connect-camera-btn");
-  const captureImageBtn = document.getElementById("capture-image-btn");
-  const enumerateDevicesBtn = document.getElementById("enumerate-devices-btn");
-  const avaliableCamerasSelect = document.getElementById("cbAvaliableCameras");
-  const saveImageBtn = document.getElementById("save-image");
-  const toggleFullScreenBtn = document.querySelector(".toggle-full-screen");
-  const openFullScreenBtn = document.getElementById("open-full-screen");
-  const closeFullScreenBtn = document.getElementById("close-full-screen");
+  const connectCameraBtn =
+    icaoAppWC.shadowRoot.getElementById("connect-camera-btn");
+  const captureImageBtn =
+    icaoAppWC.shadowRoot.getElementById("capture-image-btn");
+  const enumerateDevicesBtn = icaoAppWC.shadowRoot.getElementById(
+    "enumerate-devices-btn"
+  );
+  const avaliableCamerasSelect =
+    icaoAppWC.shadowRoot.getElementById("cbAvaliableCameras");
+  const saveImageBtn = icaoAppWC.shadowRoot.getElementById("save-image");
+  const toggleFullScreenBtn = icaoAppWC.shadowRoot.querySelector(
+    ".toggle-full-screen"
+  );
+  const openFullScreenBtn =
+    icaoAppWC.shadowRoot.getElementById("open-full-screen");
+  const closeFullScreenBtn =
+    icaoAppWC.shadowRoot.getElementById("close-full-screen");
   closeFullScreenBtn.style.display = "none";
-  const reconnectIcaoBtn = document.getElementById("reconnect-icao-btn");
+  const reconnectIcaoBtn =
+    icaoAppWC.shadowRoot.getElementById("reconnect-icao-btn");
 
-  const saveCroppedImageContainer = document.getElementById(
+  const saveCroppedImageContainer = icaoAppWC.shadowRoot.getElementById(
     "save-captured-image-btn-container"
   );
   saveCroppedImageContainer.style.display = "none";
@@ -117,9 +132,22 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
     connectwithCameraFromLocalStorage();
     handleChangeInAvaliableCameras(e);
   });
+  function closeICAOModal() {
+    if (icaoAppWC.shadowRoot.fullscreenElement) {
+      icaoAppWC.shadowRoot.exitFullscreen();
+      closeFullScreenBtn.style.display = "none";
+      openFullScreenBtn.style.display = "block";
+    }
 
+    icaoAppWC.shadowRoot
+      .querySelector(".icao-modal-container")
+      .classList.remove("show");
+    clearInterval(FaceDetectedRectangleDrawingThread);
+    window.dispatchEvent(new Event("hidden.bs.modal"));
+  }
   saveImageBtn.addEventListener("click", () => {
     SaveCaptureedImg(savedImageElm, getImgSrc);
+    closeICAOModal();
   });
   reconnectIcaoBtn.addEventListener("click", () => {
     Reconnect();
@@ -129,7 +157,7 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
     console.log("toggleFullScreenBtn is clicked");
     isFullScreen = !isFullScreen;
     toggleFullScreen();
-    if (isFullScreen && !document.fullscreenElement) {
+    if (isFullScreen && !icaoAppWC.shadowRoot.fullscreenElement) {
       openFullScreenBtn.style.display = "none";
       closeFullScreenBtn.style.display = "block";
     } else {
@@ -162,25 +190,20 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
 
   modalCloseBtn.addEventListener("click", () => {
     console.log("close btn clicked");
-    //   setShowICAOModal(false);
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-      closeFullScreenBtn.style.display = "none";
-      openFullScreenBtn.style.display = "block";
-      //   setIsFullScreen(false);
-    }
-    // stopVideoStream();
-    // StopCameraIndicatorInBrowser();
-    // StopCheckingICAOServiceThread();
-    // document.getElementById("icao-modal-start-container").style.display =
-    //   "none";
-    // removeScript("./scripts/script.js");
-    // removeStyleSheet("./styles/styles.css");
-    document.querySelector(".icao-modal-container").classList.remove("show");
-    clearInterval(FaceDetectedRectangleDrawingThread);
+    closeICAOModal();
+    // if (icaoAppWC.shadowRoot.fullscreenElement) {
+    //   icaoAppWC.shadowRoot.exitFullscreen();
+    //   closeFullScreenBtn.style.display = "none";
+    //   openFullScreenBtn.style.display = "block";
+    // }
+
+    // icaoAppWC.shadowRoot
+    //   .querySelector(".icao-modal-container")
+    //   .classList.remove("show");
+    // clearInterval(FaceDetectedRectangleDrawingThread);
   });
 
-  if (isICAO) {
+  if (icaoAppWC.isICAO) {
     croppedImage.classList.add("icao-img-width");
     croppedImage.classList.remove("no-icao-width");
   } else {

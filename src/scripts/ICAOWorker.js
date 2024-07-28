@@ -3,18 +3,18 @@ var isWorkerStopped;
 let isIcaoCheckRunning = false;
 var isIcaoRunning = false;
 export function StartWorker() {
+  console.log("=========StartWorker()============");
   var webCamDevice = window.GetWebCameProvider();
 
   isWorkerStopped = false;
 
   if (isWorkerStopped == true) {
-    //  console.log("In StartWorker isWorkerStopped == true");
     return;
   } else if (isWorkerStopped == false) {
     window.setInterval(function () {
       if (!isIcaoCheckRunning && !isWorkerStopped) {
-        var canvas = document.getElementById("canvas");
-
+        console.log(!isIcaoCheckRunning && !isWorkerStopped);
+        var canvas = icaoAppWC.shadowRoot.getElementById("canvas");
         if (canvas) {
           var img = document.createElement("img_TempToSave");
           img.src = canvas.toDataURL();
