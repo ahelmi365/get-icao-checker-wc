@@ -53,41 +53,6 @@ export function loadStyle(href, shadowRoot) {
   });
 }
 
-const loadBootstrap = (shadwoRoot) => {
-  return new Promise((resolve, reject) => {
-    try {
-      console.log(this);
-      // Load necessary scripts and styles
-      loadScript("https://code.jquery.com/jquery-3.5.1.min.js", shadwoRoot)
-        .then(() =>
-          loadScript(
-            "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js",
-            shadwoRoot
-          )
-        )
-        .then(() =>
-          loadScript(
-            "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js",
-            shadwoRoot
-          )
-        )
-        .then(() =>
-          loadStyle(
-            "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
-            shadwoRoot
-          )
-        )
-        .then()
-        .catch((err) => console.error("Error loading scripts or styles", err))
-        .finally(() => {
-          resolve();
-        });
-    } catch (error) {
-      reject();
-    }
-  });
-};
-
 const initICAOModal = async (shadwoRoot) => {
   const clonedIcaoHTML = htmlTemplate.content.cloneNode(true);
 
@@ -222,60 +187,7 @@ export class GetIcaoCheckerWc extends LitElement {
       });
     });
   }
-  async openModal() {
-    // Remove existing script element if it exists
-    const existingScript = this.shadowRoot.querySelector(
-      'script[src="./scripts/script.js"]'
-    );
-    if (existingScript) {
-      console.log("exist");
-      existingScript.remove();
-    }
-    // Initialize the modal with Bootstrap's jQuery method
-    const modal = this.shadowRoot.getElementById("icao-modal-start-container");
-    // $(modal).find(".modal").modal("show");
-    console.log({ modal });
-    const innerModal = modal.querySelector(".modal");
-    if (innerModal) {
-      innerModal.addEventListener("shown.bs.modal", async () => {
-        const { onICAOScriptLoad } = await import("./scripts/script.js");
-        onICAOScriptLoad(this.isICAOWC, this.savedImageElm, this.getImgSrc);
-      });
-    }
-    if (innerModal) {
-      console.log("listen to hidden.bs.modal");
-      window.addEventListener("hidden.bs.modal", async () => {
-        const {
-          setIsCheckingICAOServiceThread,
-          reestCashedArray,
-          stopVideoStream,
-          ClearICAOServiceThread,
-          utils,
-          EnrolmentDevices,
-        } = await import("./scripts/utils.js");
-        // const myUtils = (await import("./utils.js")).utils;
 
-        setIsCheckingICAOServiceThread(false);
-        StopWorker();
-        reestCashedArray();
-        stopVideoStream();
-        ClearICAOServiceThread(utils.CheckingICAOServiceThread);
-
-        window.stream = null;
-
-        removeScript("./scripts/script.js");
-        removeScript("./scripts/utils.js");
-        EnrolmentDevices.WebCam.Scripts.map((script) => {
-          removeScript(script);
-        });
-      });
-    }
-
-    if (innerModal) {
-      const bootstrapModal = new bootstrap.Modal(innerModal);
-      bootstrapModal.show();
-    }
-  }
   static styles = css`
     :host {
       display: block;
@@ -283,10 +195,4 @@ export class GetIcaoCheckerWc extends LitElement {
       color: var(--get-icao-checker-wc-text-color, #000);
     }
   `;
-
-  render() {
-    return html`
-      <!-- <div id="icao-modal-start-container">${modalInnerHtml}</div> -->
-    `;
-  }
 }

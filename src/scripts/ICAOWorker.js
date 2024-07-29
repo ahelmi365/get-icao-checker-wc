@@ -13,7 +13,6 @@ export function StartWorker() {
   } else if (isWorkerStopped == false) {
     window.setInterval(function () {
       if (!isIcaoCheckRunning && !isWorkerStopped) {
-        console.log(!isIcaoCheckRunning && !isWorkerStopped);
         var canvas = icaoAppWC.shadowRoot.getElementById("canvas");
         if (canvas) {
           var img = document.createElement("img_TempToSave");

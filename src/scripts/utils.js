@@ -264,7 +264,6 @@ export function ConnectCamera(camera) {
       // {ICOAChecking: ƒ, IsServiceHealthy: ƒ, GetAndOpenDevice: ƒ, GetCropImage: ƒ}
 
       webCamDevice.onUpdateICAOCheck = function (IcaoResult) {
-        console.log({ IcaoResult });
         UpdateIsIcaoCheckRunning(false);
         IcaoResult && IcaoResult.Success
           ? handleSuccessInICAOChecking(IcaoResult)
@@ -504,7 +503,6 @@ const fillFaceFeaturesWithNoGender = (parsedICAOResult) => {
 // HandleSuccessInICAOChecking
 
 export function handleSuccessInICAOChecking(IcaoResult) {
-  console.log({ IcaoResult });
   displayICAOCheckingMessage("");
   setIsDeviceConnected(true);
   const parsedICAOResult = JSON.parse(IcaoResult.Result);
@@ -576,7 +574,6 @@ const updateTooltipText = (toolTipId, faceFeaturesStatus, index, icaoItem) => {
   const tooltipInstance = icaoAppWC.shadowRoot.getElementById(
     toolTipId.toLowerCase()
   );
-  console.log({ tooltipInstance });
 
   if (
     faceFeaturesStatus[index] !==
@@ -811,7 +808,6 @@ export async function GetConnectionState() {
       captureImageBtn.disabled = true;
       return `${"WebCamserviceisnotstarted"}`;
     }
-    console.log(serviceProxyForWebCam.Connection.state);
     switch (serviceProxyForWebCam.Connection.state) {
       case 0: {
         icaoStatusInstructions.style.display = "flex";
