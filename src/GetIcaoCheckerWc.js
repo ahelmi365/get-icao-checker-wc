@@ -1,5 +1,6 @@
 import { html, css, LitElement } from "lit";
 import { StopWorker } from "./scripts/ICAOWorker.js";
+import { htmlTemplate } from "./scripts/htmlTemplate.js";
 // #region Common JS
 
 window.icaoAppWC = {};
@@ -87,9 +88,8 @@ const loadBootstrap = (shadwoRoot) => {
   });
 };
 
-const initICAOModal = (shadwoRoot) => {
-  const icaoHTMLTemplate = document.getElementById("icao-html-template");
-  const clonedIcaoHTML = icaoHTMLTemplate.content.cloneNode(true);
+const initICAOModal = async (shadwoRoot) => {
+  const clonedIcaoHTML = htmlTemplate.content.cloneNode(true);
 
   // Create modal structure
   const modal = document.createElement("div");
@@ -118,7 +118,7 @@ export class GetIcaoCheckerWc extends LitElement {
   constructor() {
     super();
 
-    console.log("constructor version 1.2.2");
+    console.log("constructor version 1.3.2");
 
     this.isICAOWC = false;
     this.openModalElmId = "open-icao-modal";
@@ -139,7 +139,7 @@ export class GetIcaoCheckerWc extends LitElement {
     icaoAppWC.shadowRoot = this.shadowRoot;
     // console.log(icaoAppWC.isICAO);
 
-    initICAOModal(this.icaoRoot);
+    await initICAOModal(this.icaoRoot);
     try {
       const openModalBtn = document.getElementById(
         this.openModalBtnId ? this.openModalBtnId : "open-icao-modal"
