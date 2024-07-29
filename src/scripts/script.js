@@ -191,16 +191,6 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
   modalCloseBtn.addEventListener("click", () => {
     console.log("close btn clicked");
     closeICAOModal();
-    // if (icaoAppWC.shadowRoot.fullscreenElement) {
-    //   icaoAppWC.shadowRoot.exitFullscreen();
-    //   closeFullScreenBtn.style.display = "none";
-    //   openFullScreenBtn.style.display = "block";
-    // }
-
-    // icaoAppWC.shadowRoot
-    //   .querySelector(".icao-modal-container")
-    //   .classList.remove("show");
-    // clearInterval(FaceDetectedRectangleDrawingThread);
   });
 
   if (icaoAppWC.isICAO) {
