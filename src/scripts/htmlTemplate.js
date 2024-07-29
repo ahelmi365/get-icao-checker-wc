@@ -136,7 +136,7 @@ htmlTemplate.innerHTML = /*html*/ `
     }
     /* video */
     #video {
-      width: 100%;
+      max-width: 100%;
     }
 
     .icao-header-container {
@@ -245,14 +245,10 @@ htmlTemplate.innerHTML = /*html*/ `
     }
 
     .profile-image video {
-      /* width: 100%; */
       height: 100%;
-      /* min-height: 525px; */
       min-height: 83vh;
       /* aspect-ratio: 1 / 1; */
       border-radius: 10px;
-      border: 1px solid gray;
-      /* transform: scaleX(-1); */
     }
 
     .data-conatiner {
@@ -535,9 +531,9 @@ htmlTemplate.innerHTML = /*html*/ `
       /* box-shadow: -5px 5px 5px 1px; */
     }
 
-    .icao-card-container span.tooltip-text {
+    .icao-card-container span.tooltip-text{
       visibility: hidden;
-      width: 120px;
+      width: 150px;
       background-color: black;
       color: #fff;
       text-align: center;
@@ -545,23 +541,32 @@ htmlTemplate.innerHTML = /*html*/ `
       padding: 10px;
       position: absolute;
       z-index: 1;
-      /* bottom: 125%; Position the tooltip above the text */
-      bottom: 0;
-      /* left: 50%; */
-      left: 120px;
-      margin-left: -60px;
       opacity: 0;
       transition: opacity 0.3s;
+
+    }
+    .icao-card-container span.tooltip-right-text {
+      left: 60px;
+    }
+    .icao-card-container span.tooltip-left-text {
+      right: 60px;
     }
 
     .icao-card-container .tooltip-text::after {
       content: "";
       position: absolute;
       top: 50%;
-      right: 100%; /* At the left of the tooltip */
       margin-top: -5px;
       border-width: 5px;
       border-style: solid;
+    }
+    .icao-card-container .tooltip-left-text::after {
+      left: 100%; /* At the left of the tooltip */
+      border-color:  transparent  transparent transparent black;
+    }
+    
+    .icao-card-container .tooltip-right-text::after {
+      right: 100%; /* At the right of the tooltip */
       border-color: transparent black transparent transparent;
     }
 
@@ -569,6 +574,7 @@ htmlTemplate.innerHTML = /*html*/ `
       visibility: visible;
       opacity: 1;
     }
+   
 
     .icao-tooltip-container {
       z-index: 20;
@@ -653,7 +659,7 @@ htmlTemplate.innerHTML = /*html*/ `
       width: 100%;
       height: 100%;
       overflow: auto; /* Allows scrolling if content overflows */
-      background-color: rgba(0, 0, 0, 0.4); /* Overlay background */
+      background-color: rgba(0, 0, 0, 0.5); /* Overlay background */
     }
 
     .modal.show {
@@ -738,7 +744,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="78"
@@ -758,7 +764,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="65"
@@ -781,7 +787,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="65"
@@ -804,7 +810,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="96"
@@ -827,7 +833,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="65"
@@ -850,7 +856,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         xmlns="http://www.w3.org/2000/svg"
@@ -890,7 +896,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="65"
@@ -929,7 +935,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="58"
@@ -952,7 +958,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="84"
@@ -983,7 +989,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="right"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-right-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="84"
@@ -1048,7 +1054,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="90"
@@ -1071,7 +1077,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         xmlns="http://www.w3.org/2000/svg"
@@ -1105,7 +1111,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="75"
@@ -1128,7 +1134,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="74"
@@ -1153,7 +1159,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="76"
@@ -1224,7 +1230,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="76"
@@ -1295,7 +1301,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="63"
@@ -1320,7 +1326,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="63"
@@ -1345,7 +1351,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="70"
@@ -1372,7 +1378,7 @@ htmlTemplate.innerHTML = /*html*/ `
                       data-bs-placement="left"
                       data-bs-title="0"
                     >
-                      <span class="tooltip-text"></span>
+                      <span class="tooltip-text tooltip-left-text"></span>
                       <svg
                         class="icon-svg white-svg"
                         width="58"
