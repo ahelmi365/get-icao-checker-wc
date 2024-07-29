@@ -954,7 +954,6 @@ export function toggleFullScreen() {
   const icaoContainer = icaoAppWC.shadowRoot.querySelector(
     ".icao-container-modal"
   );
-  console.log({ icaoContainer });
   if (!icaoAppWC.shadowRoot.fullscreenElement) {
     icaoContainer
       .requestFullscreen()
@@ -969,7 +968,7 @@ export function toggleFullScreen() {
         );
       });
   } else {
-    icaoAppWC.shadowRoot
+    document
       .exitFullscreen()
       .then(() => setIsFullScreen(false))
       .catch((err) => {

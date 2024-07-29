@@ -134,7 +134,7 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
   });
   function closeICAOModal() {
     if (icaoAppWC.shadowRoot.fullscreenElement) {
-      icaoAppWC.shadowRoot.exitFullscreen();
+      document.exitFullscreen();
       closeFullScreenBtn.style.display = "none";
       openFullScreenBtn.style.display = "block";
     }
