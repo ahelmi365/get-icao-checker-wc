@@ -405,8 +405,14 @@ htmlTemplate.innerHTML = /*html*/ `
       border: none;
       color: white;
       background: rgba(0, 0, 0, 0.8);
-      padding: 0.5rem;
       border-radius: 12px;
+    }
+    .toggle-full-screen button{
+      padding: 0.5rem;
+    }
+   
+    .save-captured-image-btn button {
+      padding: 0.9rem;
     }
 
     .bottom-row .save-captured-image-btn {
@@ -653,6 +659,10 @@ htmlTemplate.innerHTML = /*html*/ `
     .modal.show {
       /* Add .show class to display the modal */
       display: block;
+    }
+
+    .text-white{
+        color:white
     }
   </style>
 
