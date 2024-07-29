@@ -51,7 +51,6 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
 
   reestCashedArray();
   setIsCheckingICAOServiceThread(true);
-  console.log({ isCheckingICAOServiceThread });
   icaoAppWC.shadowRoot.addEventListener(
     "fullscreenchange",
     handleFullScreenChange
@@ -68,8 +67,6 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
   const selecetedCameraIDFromLocalStorage = getSelectedCameraFromLocalStorage();
   setCachedCamera(selecetedCameraIDFromLocalStorage);
   enumerateDevices(selecetedCameraIDFromLocalStorage);
-  console.log("inside onICAOScriptLoad()");
-  console.log(isCheckingICAOServiceThread && icaoAppWC.isICAO);
   if (isCheckingICAOServiceThread && icaoAppWC.isICAO) {
     ClearICAOServiceThread(utils.CheckingICAOServiceThread);
     utils.CheckingICAOServiceThread = setInterval(() => {
@@ -106,6 +103,7 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
   );
   const avaliableCamerasSelect =
     icaoAppWC.shadowRoot.getElementById("cbAvaliableCameras");
+
   const saveImageBtn = icaoAppWC.shadowRoot.getElementById("save-image");
   const toggleFullScreenBtn = icaoAppWC.shadowRoot.querySelector(
     ".toggle-full-screen"
@@ -128,9 +126,12 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
 
   // #region events
 
-  avaliableCamerasSelect.addEventListener("change", (e) => {
+  avaliableCamerasSelect.addEventListener("change", function (e) {
+    const selectedValue = this.value;
+    console.log({ selectedValue });
+
     connectwithCameraFromLocalStorage();
-    handleChangeInAvaliableCameras(e);
+    handleChangeInAvaliableCameras(selectedValue);
   });
   function closeICAOModal() {
     if (icaoAppWC.shadowRoot.fullscreenElement) {

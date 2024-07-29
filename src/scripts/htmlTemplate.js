@@ -33,7 +33,9 @@ htmlTemplate.innerHTML = /*html*/ `
     .icao-modal-container .modal-dialog.modal-dialog-centered {
       min-width: 730px;
     }
-
+    .modal-dialog{
+        margin-top:1rem
+      }
     .icao-left {
       flex-basis: 29%;
       display: flex;
@@ -669,6 +671,18 @@ htmlTemplate.innerHTML = /*html*/ `
 
     .text-white{
         color:white
+    }
+
+    .form-select {
+      display: block;
+      width: 100%;
+      padding: .375rem 2.25rem .375rem .75rem;
+      -moz-padding-start: calc(0.75rem - 3px);
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #212529;
+  
     }
   </style>
 
@@ -1505,7 +1519,7 @@ htmlTemplate.innerHTML = /*html*/ `
                   <select
                     class="form-select select-row select-avaliable-cameras"
                     aria-label="select camera"
-                    value="-1"
+                    
                     id="cbAvaliableCameras"
                   >
                     <option disabled value="-1">Select Camera</option>

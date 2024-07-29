@@ -3,7 +3,6 @@ var isWorkerStopped;
 let isIcaoCheckRunning = false;
 var isIcaoRunning = false;
 export function StartWorker() {
-  console.log("=========StartWorker()============");
   var webCamDevice = window.GetWebCameProvider();
 
   isWorkerStopped = false;

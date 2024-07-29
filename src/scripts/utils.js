@@ -81,7 +81,7 @@ const setIsLiveIcaoData = (value) => {
 // const [avaliableCameras, setAvailableCameras] = useState({});
 const avaliableCameras = [];
 const setAvailableCameras = (newCamera) => {
-  //   avaliableCameras.push(newCamera);
+  avaliableCameras.push(newCamera);
 };
 
 let pausedRequested = false;
@@ -123,7 +123,6 @@ export let videoRef;
 //#endregion
 
 export const onLoadUtils = () => {
-  console.log("onLoadUtils()");
   if (icaoAppWC.isICAO) {
     leftFeatures.classList.add("flex-column-space-around-center");
     leftFeatures.classList.remove("d-none");
@@ -251,7 +250,6 @@ export function getWebCamDevice() {
 
 // ConnectCamera
 export function ConnectCamera(camera) {
-  console.log("ConnectCamera()");
   setIsLiveIcaoData(true);
   try {
     setIsPhotoCaptured(false);
@@ -259,7 +257,6 @@ export function ConnectCamera(camera) {
     captureImageBtnContainer.style.display = "flex";
 
     if (icaoAppWC.isICAO) {
-      console.log(icaoAppWC.isICAO);
       webCamDevice = window.GetWebCameProvider();
       // {ICOAChecking: ƒ, IsServiceHealthy: ƒ, GetAndOpenDevice: ƒ, GetCropImage: ƒ}
 
@@ -852,12 +849,17 @@ export const connectwithCameraFromLocalStorage = () => {
   const avaliableCamerasSelect =
     icaoAppWC.shadowRoot.getElementById("cbAvaliableCameras");
   const selecetedCameraIDFromLocalStorage = getSelectedCameraFromLocalStorage();
-
-  avaliableCamerasSelect.value = selecetedCameraIDFromLocalStorage;
+  if (selecetedCameraIDFromLocalStorage === "-1") {
+    const firstAvailableCamera = Object.values(avaliableCameras[0])[0];
+    avaliableCamerasSelect.value = firstAvailableCamera;
+    addSelectedCameraToLocalStorage(firstAvailableCamera);
+  } else {
+    avaliableCamerasSelect.value = selecetedCameraIDFromLocalStorage;
+  }
   ConnectCamera(selecetedCameraIDFromLocalStorage);
 };
-export function handleChangeInAvaliableCameras(e) {
-  // console.log("handle Change In Avaliable Cameras");
+export function handleChangeInAvaliableCameras(selectedValue) {
+  console.log("handle Change In Avaliable Cameras");
   // console.log("avaliableCameras", avaliableCameras);
   // console.log(e.target.value);
 
@@ -869,31 +871,18 @@ export function handleChangeInAvaliableCameras(e) {
   // );
 
   // TODO: caheck the value of e.target.value to be camera id
-  // console.log(
-  //   "handleChangeInAvaliableCameras (handleChangeInAvaliableCameras):",
-  //   e.target.value
-  // );
-  addSelectedCameraToLocalStorage(e.target.value);
 
-  setSelectedCamera(e.target.value);
-  setCachedCamera(e.target.value);
+  console.log(
+    "handleChangeInAvaliableCameras (handleChangeInAvaliableCameras):",
+    selectedValue
+  );
+  addSelectedCameraToLocalStorage(selectedValue);
+
+  setSelectedCamera(selectedValue);
+  setCachedCamera(selectedValue);
   // ConnectCamera(e.target.value);
 }
 
-// useEffect to set setCashedCameraToSelect to the cashed camera when the component didunmount
-
-// listen to the change in the selected camera
-// useEffect(() => {
-//   const selecetedCameraIDFromLocalStorage = getSelectedCameraFromLocalStorage();
-//   try {
-//     ConnectCamera(selecetedCameraIDFromLocalStorage);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }, [selectedCamera]);
-
-// handle toggleAvailableCams
-// const [showSelectedCamera, setShowSelectedCamera] = useState(true);
 let showSelectedCamera;
 const setShowSelectedCamera = () => {};
 export function toggleAvailableCams() {
@@ -1027,8 +1016,12 @@ export const setLableMessageForICAO = (newMEssage) => {
 
 // function to store the selected camera in local storage:
 export const addSelectedCameraToLocalStorage = (selecetedCameraID) => {
-  // console.log("Add selecetedCameraID:", selecetedCameraID);
-  localStorage.setItem("icaoSelectedCamera", selecetedCameraID);
+  const firstAvailableCamera = Object.values(avaliableCameras[0])[0];
+  if (selecetedCameraID === "-1") {
+    localStorage.setItem("icaoSelectedCamera", firstAvailableCamera);
+  } else {
+    localStorage.setItem("icaoSelectedCamera", selecetedCameraID);
+  }
 };
 
 // function to get the stored camera from local storage:
