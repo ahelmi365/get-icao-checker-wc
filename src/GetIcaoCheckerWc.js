@@ -83,7 +83,7 @@ export class GetIcaoCheckerWc extends LitElement {
   constructor() {
     super();
 
-    console.log("constructor version 1.3.2");
+    console.log("constructor version 1.3.4");
 
     this.isICAOWC = false;
     this.openModalElmId = "open-icao-modal";
