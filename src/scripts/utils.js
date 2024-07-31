@@ -3,7 +3,7 @@ import {
   StopWorker,
   UpdateIsIcaoCheckRunning,
 } from "./ICAOWorker.js";
-
+import { t } from "../i18n/translate.js";
 // import "./index.js";
 export const utilsCommonVars = {
   isICAO: true,
@@ -201,7 +201,8 @@ export function enumerateDevices(cachedConnectedCamera) {
     })
     .catch(function (err) {
       setLoading(false);
-      alert(err);
+      console.log(err);
+      alert(t("cameranotallowed"));
     });
 }
 
@@ -537,13 +538,12 @@ const enableDisableCameraButtons = (
   ) {
     connectCameraBtn.disabled = true;
     captureImageBtn.disabled = true;
-    displayICAOCheckingMessage(rollPitchYawErrorMessage);
+    displayICAOCheckingMessage(t("IcaoErrorMessage"));
     setIsDeviceConnected(false);
   }
 };
 // showYawRollPitchErrorMessage
-const rollPitchYawErrorMessage =
-  "Failed to detect the face correctly, please look at the camera and try capturing again";
+
 export function showYawRollPitchErrorMessage(faceFeatures) {
   // Roll
   const rollFeature = getFeatureByAttributeIdStr(faceFeatures, "Roll");
@@ -583,32 +583,35 @@ const updateTooltipText = (toolTipId, faceFeaturesStatus, index, icaoItem) => {
 
     const toolTipRangStatusText =
       icaoItem.FaceAttributeRangeStatus === IcaoAttributesValues.TOO_LOW
-        ? `<span class="red-font">Too Low</span>`
+        ? `<span class="red-font">${t("toolow")}</span>`
         : icaoItem.FaceAttributeRangeStatus === IcaoAttributesValues.TOO_HIGH
-        ? `<span class="red-font">Too High</span>`
+        ? `<span class="red-font">${t("toohigh")}</span>`
         : icaoItem.FaceAttributeRangeStatus === IcaoAttributesValues.IN_RANGE
-        ? ` <span class="green-font">In Range</span>`
+        ? ` <span class="green-font">${t("inrange")}</span>`
         : "not-found";
 
     const tooltipCompatabilityText =
       icaoItem.ICAOStatusStr === IcaoAttributesValues.COMPATIBLE
         ? ""
-        : `<p class="white-font">Please check the ${icaoItem.FaceAttributeIdStr} to match ICAO Specifications.</p>`;
+        : `<p class="white-font">${t(
+            "pleasecheckspec",
+            icaoItem.FaceAttributeIdStr
+          )}</p>`;
 
     const tooltipIcaoStatusText = `<p className="icao-card-details-item white-font"> 
-    The ICAO Status is  <strong><span class= ${
+    ${t("icaostatus")} <strong><span class= ${
       icaoItem.ICAOStatusStr === IcaoAttributesValues.COMPATIBLE
         ? "green-font"
         : "red-font"
     }>${icaoItem.ICAOStatusStr}</span></strong>.</p>`;
 
-    // tooltipInstance?.setContent({
-    //   ".tooltip-inner": `<span class="icao-card-details-item white-font">The ${icaoItem.FaceAttributeIdStr} is <strong>${toolTipRangStatusText}</strong>.</span>
-    //         ${tooltipIcaoStatusText}${tooltipCompatabilityText}`,
-    // });
     tooltipInstance.querySelector(
       ".tooltip-text"
-    ).innerHTML = `${tooltipIcaoStatusText}${tooltipCompatabilityText}`;
+    ).innerHTML = `<p class="icao-card-details-item white-font text-white">${t(
+      "the"
+    )} ${icaoItem.FaceAttributeIdStr} ${t(
+      "is"
+    )} <strong>${toolTipRangStatusText}</strong></p> ${tooltipIcaoStatusText}${tooltipCompatabilityText}`;
   }
 };
 //  IsShowOnlyError() // to filter only error, not needed, commented by Ali
@@ -626,7 +629,7 @@ export function displayICAOCheckingMessage(message) {
     // divICAOCheckingMessage.style.visibility = "visible";
     if (message != undefined && message.length > 0) {
       if (message !== divICAOCheckingMessage.innerText) {
-        divICAOCheckingMessage.innerText = message;
+        divICAOCheckingMessage.innerText = t(message);
       }
       captureImageBtn.disabled = true;
     } else {
@@ -803,14 +806,14 @@ export async function GetConnectionState() {
       icaoStatusInstructions.style.display = "flex";
       connectCameraBtn.disabled = true;
       captureImageBtn.disabled = true;
-      return `${"WebCamserviceisnotstarted"}`;
+      return t("WebCamserviceisnotstarted");
     }
     switch (serviceProxyForWebCam.Connection.state) {
       case 0: {
         icaoStatusInstructions.style.display = "flex";
         connectCameraBtn.disabled = true;
         captureImageBtn.disabled = true;
-        return `${"Connecting To ICAO Service..."}`;
+        return t("ConnectingtoICAOservice");
       }
       case 1: {
         const response = await window.GetWebCameProvider().IsServiceHealthy();
@@ -818,7 +821,7 @@ export async function GetConnectionState() {
           icaoStatusInstructions.style.display = "none";
           connectCameraBtn.disabled = false;
           // captureImageBtn.disabled = false;
-          return `${"ICAO Service Is Connected"}`;
+          return t("ICAOserviceisConnected");
         } else {
           icaoStatusInstructions.style.display = "flex";
           connectCameraBtn.disabled = true;
@@ -831,14 +834,14 @@ export async function GetConnectionState() {
         connectCameraBtn.disabled = true;
         captureImageBtn.disabled = true;
 
-        return `${"Reconnecting To ICAO Service..."}`;
+        return t("ReconnectingtoICAOservice");
       }
       case 4: {
         icaoStatusInstructions.style.display = "flex";
         connectCameraBtn.disabled = true;
         captureImageBtn.disabled = true;
 
-        return `${"ICAO Service Is Disconnected"}`;
+        return t("ICAOserviceisdisconnected");
       }
       default:
     }

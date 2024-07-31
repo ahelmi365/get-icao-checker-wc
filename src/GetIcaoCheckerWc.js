@@ -1,6 +1,8 @@
 import { html, css, LitElement } from "lit";
+// import {html, render} from 'https://esm.run/lit-html@1';
 import { StopWorker } from "./scripts/ICAOWorker.js";
 import { htmlTemplate } from "./scripts/htmlTemplate.js";
+
 // #region Common JS
 
 window.icaoAppWC = {};
@@ -91,6 +93,18 @@ export class GetIcaoCheckerWc extends LitElement {
     this.getImgSrc = (src) => console.log({ src });
     // this.attachShadow({ mode: "open" });
     this.icaoRoot = this.attachShadow({ mode: "open" });
+    console.log(this.icaoRoot);
+
+    const styles = document.createElement("style");
+    this.icaoRoot.appendChild(styles);
+
+    const loadStyle = async () => {
+      const request = await fetch("../src/styles.css");
+      const css = await request.text();
+      console.log(css);
+      styles.textContent = css;
+    };
+    loadStyle();
   }
 
   async connectedCallback() {
