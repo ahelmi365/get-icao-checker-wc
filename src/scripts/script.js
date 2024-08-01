@@ -15,7 +15,7 @@
 // #endregion
 // #region UseEffects
 // ---------------- apply effects ----------------------
-export const onICAOScriptLoad = async () => {
+export const onICAOScriptLoad = async (getImgSrc) => {
   var {
     CaptureImage,
     ClearICAOServiceThread,
@@ -145,7 +145,7 @@ export const onICAOScriptLoad = async () => {
     window.dispatchEvent(new Event("icao-hidden.bs.modal"));
   }
   saveImageBtn.addEventListener("click", () => {
-    SaveCaptureedImg();
+    SaveCaptureedImg(getImgSrc);
     closeICAOModal();
   });
   reconnectIcaoBtn.addEventListener("click", () => {

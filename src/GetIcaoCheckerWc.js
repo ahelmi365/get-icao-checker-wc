@@ -93,13 +93,13 @@ export class GetIcaoCheckerWc extends LitElement {
 
   constructor() {
     super();
-    console.log("constructor version 1.4.12");
+    console.log("constructor version 1.5.3");
 
     this.isICAOWC = false;
     this.language = "en";
     this.openModalElmId = "";
     this.savedImageElmId = "";
-    // this.getImgSrc = (src) => console.log({ src });
+    this.getImgSrc = (src) => console.log({ src });
     console.log(this.getImgSrc);
 
     this.icaoRoot = this.attachShadow({ mode: "open" });
@@ -152,7 +152,7 @@ export class GetIcaoCheckerWc extends LitElement {
     // this.openModal(this);
     const { onICAOScriptLoad } = await import("./scripts/script.js");
     console.log(this);
-    onICAOScriptLoad();
+    onICAOScriptLoad(this.getImgSrc);
 
     window.addEventListener("icao-hidden.bs.modal", async () => {
       const {

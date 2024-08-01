@@ -764,7 +764,7 @@ export async function CaptureImage() {
 }
 
 // SaveCaptureedImg
-export function SaveCaptureedImg() {
+export function SaveCaptureedImg(getImgSrc) {
   StopCameraIndicatorInBrowser();
   ClearICAOServiceThread();
   const croppedImage = icaoAppWC.shadowRoot.getElementById("cropped");
@@ -773,10 +773,10 @@ export function SaveCaptureedImg() {
     console.log(icaoAppWC.savedImageElm);
     icaoAppWC.savedImageElm.src = croppedImage.src;
   }
-  console.log(icaoAppWC.getImgSrc);
-  console.log(typeof icaoAppWC.getImgSrc);
-  if (typeof icaoAppWC.getImgSrc === "function") {
-    icaoAppWC.getImgSrc(croppedImage.src);
+  console.log(getImgSrc);
+  console.log(typeof getImgSrc);
+  if (typeof getImgSrc === "function") {
+    getImgSrc(croppedImage.src);
   }
   stopVideoStream();
   croppedImage.style.display = "none";
