@@ -23,7 +23,6 @@
     </button>
     <button
       class="btn btn-primary"
-      id="open-icao-modal"
       name="open-icao-modal"
       type="button"
       onclick="logSRC()"
@@ -47,7 +46,7 @@
       defer
       type="module"
     ></script> -->
-
+    <script src="../get-icao-checker-wc.js" type="module" defer></script>
     <script type="module" defer>
       import { html, render } from "lit";
       import "../get-icao-checker-wc.js";
@@ -60,14 +59,13 @@
 
       const setSavedImgSrc = (src) => {
         console.log("hii from setSavedImgSrc()");
-        console.log({ src });
         imgSrc = src;
       };
 
       render(
         html`
           <get-icao-checker-wc
-            isICAOWC=${true}
+            isICAOWC
             openModalElmId="open-icao-modal"
             savedImageElmId="icao-result-image"
             .getImgSrc=${setSavedImgSrc}

@@ -15,7 +15,7 @@
 // #endregion
 // #region UseEffects
 // ---------------- apply effects ----------------------
-export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
+export const onICAOScriptLoad = async () => {
   var {
     CaptureImage,
     ClearICAOServiceThread,
@@ -41,12 +41,10 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
     setLableMessageForICAO,
     stopVideoStream,
     toggleFullScreen,
-    utilsCommonVars,
     onLoadUtils,
     utils,
   } = await import("./utils.js");
 
-  utilsCommonVars.isICAO = icaoAppWC.isICAO;
   onLoadUtils();
 
   reestCashedArray();
@@ -144,10 +142,10 @@ export const onICAOScriptLoad = async (isICAOWC, savedImageElm, getImgSrc) => {
       .querySelector(".icao-modal-container")
       .classList.remove("show");
     clearInterval(FaceDetectedRectangleDrawingThread);
-    window.dispatchEvent(new Event("hidden.bs.modal"));
+    window.dispatchEvent(new Event("icao-hidden.bs.modal"));
   }
   saveImageBtn.addEventListener("click", () => {
-    SaveCaptureedImg(savedImageElm, getImgSrc);
+    SaveCaptureedImg();
     closeICAOModal();
   });
   reconnectIcaoBtn.addEventListener("click", () => {

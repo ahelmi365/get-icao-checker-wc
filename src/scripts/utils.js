@@ -5,11 +5,7 @@ import {
 } from "./ICAOWorker.js";
 import { t } from "../i18n/translate.js";
 // import "./index.js";
-export const utilsCommonVars = {
-  isICAO: true,
-  isPhotoCaptured: false,
-  isDeviceAvailable: true,
-};
+
 const icaoCheckerElement =
   icaoAppWC.shadowRoot.querySelector("icao-checker-wc");
 // set the backendURL
@@ -49,11 +45,7 @@ const leftAndRightFeatures = [
   ...leftFeatures.children,
   ...rightFeatures.children,
 ];
-// if (!utilsCommonVars.isICAO) {
-//   console.log("utilsCommonVars.isICAO", utilsCommonVars.isICAO);
-//   leftFeatures.style.display = "none";
-//   rightFeatures.style.display = "none";
-// }
+
 const connectCameraBtnContainer = icaoAppWC.shadowRoot.getElementById(
   "connect-camera-btn-container"
 );
@@ -772,15 +764,19 @@ export async function CaptureImage() {
 }
 
 // SaveCaptureedImg
-export function SaveCaptureedImg(savedImageElm, getImgSrc) {
+export function SaveCaptureedImg() {
   StopCameraIndicatorInBrowser();
   ClearICAOServiceThread();
   const croppedImage = icaoAppWC.shadowRoot.getElementById("cropped");
   // updatePhotoImage(croppedImage.src);
-  savedImageElm.src = croppedImage.src;
-  console.log({ getImgSrc });
-  if (typeof getImgSrc === "function") {
-    getImgSrc(croppedImage.src);
+  if (icaoAppWC.savedImageElm) {
+    console.log(icaoAppWC.savedImageElm);
+    icaoAppWC.savedImageElm.src = croppedImage.src;
+  }
+  console.log(icaoAppWC.getImgSrc);
+  console.log(typeof icaoAppWC.getImgSrc);
+  if (typeof icaoAppWC.getImgSrc === "function") {
+    icaoAppWC.getImgSrc(croppedImage.src);
   }
   stopVideoStream();
   croppedImage.style.display = "none";

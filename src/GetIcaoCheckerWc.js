@@ -5,10 +5,14 @@ import { htmlTemplate } from "./scripts/htmlTemplate.js";
 
 // #region Common JS
 
-window.icaoAppWC = {};
-icaoAppWC.isICAO = false;
-icaoAppWC.shadowRoot = null;
-icaoAppWC.language = "en";
+window.icaoAppWC = {
+  isICAO: false,
+  shadowRoot: null,
+  language: "en",
+  savedImageElm: null,
+  openModalElmId: "",
+  getImgSrc: null,
+};
 
 export function removeScript(src) {
   const scriptToRemove = document.querySelector(`script[src="${src}"]`);
@@ -77,44 +81,45 @@ const initICAOModal = async (shadwoRoot) => {
 // #endregion
 
 export class GetIcaoCheckerWc extends LitElement {
-  static properties = {
-    isICAOWC: { type: Boolean },
-    openModalElmId: { type: String },
-    savedImageElmId: { type: String },
-    language: { type: String },
-    getImgSrc: { type: Function },
-  };
+  static get properties() {
+    return {
+      isICAOWC: { type: Boolean },
+      language: { type: String },
+      openModalElmId: { type: String },
+      savedImageElmId: { type: String },
+      getImgSrc: { type: Function },
+    };
+  }
 
   constructor() {
     super();
-
     console.log("constructor version 1.4.12");
 
     this.isICAOWC = false;
     this.language = "en";
     this.openModalElmId = "";
     this.savedImageElmId = "";
-    this.getImgSrc = (src) => console.log({ src });
-    // this.attachShadow({ mode: "open" });
+    // this.getImgSrc = (src) => console.log({ src });
+    console.log(this.getImgSrc);
+
     this.icaoRoot = this.attachShadow({ mode: "open" });
+    icaoAppWC.shadowRoot = this.icaoRoot;
     console.log(this.icaoRoot);
 
     localStorage.setItem("icao-lang-pref", "en");
   }
 
   async connectedCallback() {
-    // console.log(this.shadowRoot);
-    // console.log(this.isICAOWC);
-    console.log(this.openModalElmId);
-    console.log(this.language);
-    // console.log(this.getImgSrc);
-
-    icaoAppWC.isICAO = this.getAttribute("isICAOWC");
+    icaoAppWC.isICAO = this.hasAttribute("isICAOWC");
     icaoAppWC.language = this.getAttribute("language") || "en";
     icaoAppWC.openModalElmId = this.getAttribute("openModalElmId");
-    icaoAppWC.savedImageElmId = this.getAttribute("savedImageElmId");
-    icaoAppWC.shadowRoot = this.shadowRoot;
-    console.log(icaoAppWC.language);
+    icaoAppWC.getImgSrc = this.getImgSrc;
+    icaoAppWC.savedImageElm = document.getElementById(
+      this.getAttribute("savedImageElmId")
+    );
+
+    console.log(icaoAppWC);
+
     localStorage.setItem("icao-lang-pref", icaoAppWC.language);
     // console.log(icaoAppWC.isICAO);
 
@@ -138,34 +143,18 @@ export class GetIcaoCheckerWc extends LitElement {
       console.error(error);
     }
     // handle saved image id
-
-    try {
-      this.savedImageElm = document.getElementById(
-        this.savedImageId ? this.savedImageId : "icao-result-image"
-      );
-      if (!this.savedImageElm) {
-        throw new Error(
-          "No image element found to store the cropped image from ICAO Modal, please check the 'data-saved-image-id' attribute"
-        );
-      }
-    } catch (error) {
-      alert(error);
-      console.error(
-        "No image element found to store the cropped image from ICAO Modal, please check the 'data-saved-image-id' attribute"
-      );
-    }
   }
 
   async openModalAndoadIcaoScripts() {
-    console.log(this.savedImageElm);
     this.shadowRoot
       .querySelector(".icao-modal-container")
       .classList.add("show");
     // this.openModal(this);
     const { onICAOScriptLoad } = await import("./scripts/script.js");
-    onICAOScriptLoad(this.isICAOWC, this.savedImageElm, this.getImgSrc);
+    console.log(this);
+    onICAOScriptLoad();
 
-    window.addEventListener("hidden.bs.modal", async () => {
+    window.addEventListener("icao-hidden.bs.modal", async () => {
       const {
         setIsCheckingICAOServiceThread,
         reestCashedArray,
@@ -199,11 +188,7 @@ export class GetIcaoCheckerWc extends LitElement {
     });
   }
 
-  static styles = css`
-    :host {
-      display: block;
-      padding: 25px;
-      color: var(--get-icao-checker-wc-text-color, #000);
-    }
-  `;
+  disconnectedCallback() {
+    console.log("disconnectedCallback()");
+  }
 }
