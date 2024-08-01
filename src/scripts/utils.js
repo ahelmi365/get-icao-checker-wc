@@ -5,9 +5,10 @@ import {
 } from "./ICAOWorker.js";
 import { t } from "../i18n/translate.js";
 // import "./index.js";
-
-const icaoCheckerElement =
-  icaoAppWC.shadowRoot.querySelector("icao-checker-wc");
+console.log("========= this is utils ========");
+console.log(window.icaoAppWC);
+// const icaoCheckerElement =
+//   icaoAppWC.shadowRoot.querySelector("icao-checker-wc");
 // set the backendURL
 const webCamScriptDomainName = "http://localhost:9002";
 const backendURL = "http://localhost:9002";
@@ -100,8 +101,6 @@ export const setIsCheckingICAOServiceThread = (value) => {
   isCheckingICAOServiceThread = value;
 };
 
-// const FaceDetectedRectangleDrawingThread = useRef(null);
-export let grapFrameIntervalId;
 // const [cachedCamera, setCachedCamera] = useState("");
 export let cachedCamera;
 export const setCachedCamera = (value) => {
@@ -214,16 +213,15 @@ export function SetCachedConnectedCamera(avCameras, cachedConnectedCamera) {
 
 // StopCheckingICAOServiceThread
 export function StopCheckingICAOServiceThread() {
-  ClearICAOServiceThread();
+  clearICAOServiceThread();
   setIsCheckingICAOServiceThread(false);
   StopCameraIndicatorInBrowser();
 
-  grapFrameIntervalId = null;
+  icaoAppWC.grapFrameIntervalId = null;
   window.stream = null;
 }
 
-// ClearICAOServiceThread
-export function ClearICAOServiceThread(id) {
+export function clearICAOServiceThread(id) {
   clearInterval(id);
   CheckingICAOServiceThread = null;
 }
@@ -384,7 +382,7 @@ export async function StartVideo() {
   // clearInterval(faceDetectedRectangleDrawingThread);
   // faceDetectedRectangleDrawingThread = null;
 
-  grapFrameIntervalId = setInterval(() => {
+  icaoAppWC.grapFrameIntervalId = setInterval(() => {
     if (window.stream) {
       // console.log("window.stream running");
       grapFrame();
@@ -395,8 +393,8 @@ export async function StartVideo() {
 export function stopVideoStream() {
   console.log("stopVideoStream() is called");
 
-  window.clearInterval(grapFrameIntervalId);
-  grapFrameIntervalId = null;
+  window.clearInterval(icaoAppWC.grapFrameIntervalId);
+  icaoAppWC.grapFrameIntervalId = null;
   const videoElement = icaoAppWC.shadowRoot.getElementById("video");
   const stream = videoElement.srcObject;
   const tracks = stream?.getTracks();
@@ -595,12 +593,15 @@ const updateTooltipText = (toolTipId, faceFeaturesStatus, index, icaoItem) => {
 //  StyleICAOFeatureRow() // to draw the table, not needed , commented by Ali
 
 // DisplayICAOCheckingMessage
+const divICAOCheckingMessage = icaoAppWC.shadowRoot.getElementById(
+  "divICAOCheckingMessage"
+);
+if (!icaoAppWC.isICAO) {
+  divICAOCheckingMessage.style.display = "none";
+}
 export function displayICAOCheckingMessage(message) {
   // console.log("DisplayICAOCheckingMessage", message);
   // console.log("typeof message",  message.length);
-  const divICAOCheckingMessage = icaoAppWC.shadowRoot.getElementById(
-    "divICAOCheckingMessage"
-  );
   if (divICAOCheckingMessage) {
     divICAOCheckingMessage.style.display = "flex";
     // divICAOCheckingMessage.style.visibility = "visible";
@@ -656,9 +657,9 @@ export async function Reconnect() {
 
 //CaptureImage
 export async function CaptureImage() {
-  window.clearInterval(grapFrameIntervalId);
+  window.clearInterval(icaoAppWC.grapFrameIntervalId);
 
-  grapFrameIntervalId = null;
+  icaoAppWC.grapFrameIntervalId = null;
 
   pausedRequested = true;
   StopWorker();
@@ -752,7 +753,7 @@ export async function CaptureImage() {
 // SaveCaptureedImg
 export function SaveCaptureedImg(getImgSrc) {
   StopCameraIndicatorInBrowser();
-  ClearICAOServiceThread();
+  clearICAOServiceThread();
   const croppedImage = icaoAppWC.shadowRoot.getElementById("cropped");
   // updatePhotoImage(croppedImage.src);
   if (icaoAppWC.savedImageElm) {
@@ -776,55 +777,66 @@ export function StopCameraIndicatorInBrowser() {
   }
 }
 
-// GetConnectionState
-export async function GetConnectionState() {
-  // console.log("GetConnectionState() is called");
-  if (icaoAppWC.isICAO) {
-    serviceProxyForWebCam = window.serviceProxyForWebCam;
+const lblMessageErrorElm =
+  icaoAppWC.shadowRoot.getElementById("lblMessageForICAO");
 
-    if (typeof serviceProxyForWebCam == "undefined") {
-      icaoStatusInstructions.style.display = "flex";
-      connectCameraBtn.disabled = true;
-      captureImageBtn.disabled = true;
-      return t("WebCamserviceisnotstarted");
-    }
-    switch (serviceProxyForWebCam.Connection.state) {
-      case 0: {
+// GetConnectionState
+icaoAppWC.icaoServiceConnectionStateIntervalId = "test";
+export async function getICAOServiceConnectionState() {
+  if (isCheckingICAOServiceThread && icaoAppWC.isICAO) {
+    icaoAppWC.icaoServiceConnectionStateIntervalId = setInterval(async () => {
+      console.log("GetConnectionState() is called");
+      serviceProxyForWebCam = window.serviceProxyForWebCam;
+
+      if (typeof serviceProxyForWebCam == "undefined") {
         icaoStatusInstructions.style.display = "flex";
         connectCameraBtn.disabled = true;
         captureImageBtn.disabled = true;
-        return t("ConnectingtoICAOservice");
+        return (lblMessageErrorElm.innerText = t("WebCamserviceisnotstarted"));
       }
-      case 1: {
-        const response = await window.GetWebCameProvider().IsServiceHealthy();
-        if (response && response.Result) {
-          icaoStatusInstructions.style.display = "none";
-          connectCameraBtn.disabled = false;
-          // captureImageBtn.disabled = false;
-          return t("ICAOserviceisConnected");
-        } else {
+      switch (serviceProxyForWebCam.Connection.state) {
+        case 0: {
           icaoStatusInstructions.style.display = "flex";
           connectCameraBtn.disabled = true;
           captureImageBtn.disabled = true;
-          return response.Message;
+          return (lblMessageErrorElm.innerText = t("ConnectingtoICAOservice"));
         }
-      }
-      case 2: {
-        icaoStatusInstructions.style.display = "flex";
-        connectCameraBtn.disabled = true;
-        captureImageBtn.disabled = true;
+        case 1: {
+          const response = await window.GetWebCameProvider().IsServiceHealthy();
+          if (response && response.Result) {
+            icaoStatusInstructions.style.display = "none";
+            connectCameraBtn.disabled = false;
+            // captureImageBtn.disabled = false;
+            return (lblMessageErrorElm.innerText = t("ICAOserviceisConnected"));
+          } else {
+            icaoStatusInstructions.style.display = "flex";
+            connectCameraBtn.disabled = true;
+            captureImageBtn.disabled = true;
+            return (lblMessageErrorElm.innerText = response.Message);
+          }
+        }
+        case 2: {
+          icaoStatusInstructions.style.display = "flex";
+          connectCameraBtn.disabled = true;
+          captureImageBtn.disabled = true;
 
-        return t("ReconnectingtoICAOservice");
-      }
-      case 4: {
-        icaoStatusInstructions.style.display = "flex";
-        connectCameraBtn.disabled = true;
-        captureImageBtn.disabled = true;
+          return (lblMessageErrorElm.innerText = t(
+            "ReconnectingtoICAOservice"
+          ));
+        }
+        case 4: {
+          icaoStatusInstructions.style.display = "flex";
+          connectCameraBtn.disabled = true;
+          captureImageBtn.disabled = true;
 
-        return t("ICAOserviceisdisconnected");
+          return (lblMessageErrorElm.innerText = t(
+            "ICAOserviceisdisconnected"
+          ));
+        }
+        default:
       }
-      default:
-    }
+    }, 1000);
+    console.log(icaoAppWC.icaoServiceConnectionStateIntervalId);
   }
 }
 
@@ -991,11 +1003,6 @@ export function removeFullscreenStyles() {
 }
 
 // const [lableMessageForICAO, setLableMessageForICAO] = useState(false);
-
-export let lableMessageForICAO;
-export const setLableMessageForICAO = (newMEssage) => {
-  lableMessageForICAO = newMEssage;
-};
 
 // function to store the selected camera in local storage:
 export const addSelectedCameraToLocalStorage = (selecetedCameraID) => {

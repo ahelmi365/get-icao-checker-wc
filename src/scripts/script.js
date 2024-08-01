@@ -1,28 +1,13 @@
 // #region Imports
-// import "./utils.js";
-// Function to dynamically import the module
 
-// #endregion
-
-// #region Bootstrap tootltip setup
-// Enable bootstrap tooltip
-// const tooltipTriggerList = icaoAppWC.shadowRoot.querySelectorAll(
-//   '[data-bs-toggle="tooltip"]'
-// );
-// const tooltipList = [...tooltipTriggerList].map(
-//   (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
-// );
-// #endregion
-// #region UseEffects
 // ---------------- apply effects ----------------------
 export const onICAOScriptLoad = async (getImgSrc) => {
   var {
     CaptureImage,
-    ClearICAOServiceThread,
+    clearICAOServiceThread,
     ConnectCamera,
     EnrolmentDevices,
-    grapFrameIntervalId: FaceDetectedRectangleDrawingThread,
-    GetConnectionState,
+    getICAOServiceConnectionState,
     Reconnect,
     RetrieveScripts,
     SaveCaptureedImg,
@@ -38,10 +23,11 @@ export const onICAOScriptLoad = async (getImgSrc) => {
     reestCashedArray,
     setCachedCamera,
     setIsCheckingICAOServiceThread,
-    setLableMessageForICAO,
     stopVideoStream,
     toggleFullScreen,
     onLoadUtils,
+    icaoServiceConnectionStateIntervalId,
+
     utils,
   } = await import("./utils.js");
 
@@ -63,27 +49,12 @@ export const onICAOScriptLoad = async (getImgSrc) => {
   }
 
   const selecetedCameraIDFromLocalStorage = getSelectedCameraFromLocalStorage();
-  setCachedCamera(selecetedCameraIDFromLocalStorage);
-  enumerateDevices(selecetedCameraIDFromLocalStorage);
-  if (isCheckingICAOServiceThread && icaoAppWC.isICAO) {
-    ClearICAOServiceThread(utils.CheckingICAOServiceThread);
-    utils.CheckingICAOServiceThread = setInterval(() => {
-      if (isCheckingICAOServiceThread && icaoAppWC.isICAO) {
-        GetConnectionState().then((ConnectionState) => {
-          setLableMessageForICAO(ConnectionState);
-          const lblMessageError =
-            icaoAppWC.shadowRoot.getElementById("lblMessageForICAO");
-          lblMessageError
-            ? (lblMessageError.innerText = ConnectionState)
-            : null;
 
-          // $("#lblMessageForICAO")?.text(ConnectionState);
-        });
-      }
-    }, 1000);
-  } else {
-    ClearICAOServiceThread(utils.CheckingICAOServiceThread);
-  }
+  setCachedCamera(selecetedCameraIDFromLocalStorage);
+
+  enumerateDevices(selecetedCameraIDFromLocalStorage);
+
+  getICAOServiceConnectionState();
 
   // #endregion
   // #region HTML elements
@@ -141,7 +112,11 @@ export const onICAOScriptLoad = async (getImgSrc) => {
     icaoAppWC.shadowRoot
       .querySelector(".icao-modal-container")
       .classList.remove("show");
-    clearInterval(FaceDetectedRectangleDrawingThread);
+    clearInterval(icaoAppWC.grapFrameIntervalId);
+
+    clearInterval(icaoAppWC.icaoServiceConnectionStateIntervalId);
+    icaoAppWC.icaoServiceConnectionStateIntervalId = null;
+    setIsCheckingICAOServiceThread(false);
     window.dispatchEvent(new Event("icao-hidden.bs.modal"));
   }
   saveImageBtn.addEventListener("click", () => {
@@ -177,6 +152,7 @@ export const onICAOScriptLoad = async (getImgSrc) => {
       getSelectedCameraFromLocalStorage();
     try {
       ConnectCamera(selecetedCameraIDFromLocalStorage);
+      // getICAOServiceConnectionState();
     } catch (error) {
       console.log(error);
     }

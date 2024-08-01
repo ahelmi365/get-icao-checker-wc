@@ -149,7 +149,7 @@ export class GetIcaoCheckerWc extends LitElement {
         setIsCheckingICAOServiceThread,
         reestCashedArray,
         stopVideoStream,
-        ClearICAOServiceThread,
+        clearICAOServiceThread,
         utils,
         EnrolmentDevices,
       } = await import("./scripts/utils.js");
@@ -159,7 +159,7 @@ export class GetIcaoCheckerWc extends LitElement {
       StopWorker();
       reestCashedArray();
       stopVideoStream();
-      ClearICAOServiceThread(utils.CheckingICAOServiceThread);
+      clearICAOServiceThread(utils.CheckingICAOServiceThread);
 
       window.stream = null;
 
