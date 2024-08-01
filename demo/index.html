@@ -21,6 +21,15 @@
     >
       Open ICAO Modal
     </button>
+    <button
+      class="btn btn-primary"
+      id="open-icao-modal"
+      name="open-icao-modal"
+      type="button"
+      onclick="logSRC()"
+    >
+      log img src
+    </button>
 
     <div class="result-image card mt-4 p-4" style="height: 315px">
       <img
@@ -39,22 +48,30 @@
       type="module"
     ></script> -->
 
-    <script type="module">
+    <script type="module" defer>
       import { html, render } from "lit";
       import "../get-icao-checker-wc.js";
+      console.log("hii from html");
+      let imgSrc = "test";
+      window.logSRC = () => {
+        console.log("hi from logSRC");
+        console.log(imgSrc);
+      };
 
       const setSavedImgSrc = (src) => {
         console.log("hii from setSavedImgSrc()");
         console.log({ src });
+        imgSrc = src;
       };
 
       render(
         html`
           <get-icao-checker-wc
-            .isICAOWC=${true}
-            .openModalElmId=${"open-icao-modal"}
-            .savedImageElmId=${"icao-result-image"}
+            isICAOWC=${true}
+            openModalElmId="open-icao-modal"
+            savedImageElmId="icao-result-image"
             .getImgSrc=${setSavedImgSrc}
+            language="es"
           />
         `,
         document.querySelector("#demo")

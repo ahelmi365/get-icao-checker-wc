@@ -81,10 +81,7 @@ const languages = {
   },
 };
 export const t = (key, varName = "") => {
-  console.log({ key });
-  const lang = localStorage.getItem("icao-lang-pref") || "en"; // "en" - "es"
-  console.log(languages[lang][key]);
-
+  const lang = localStorage.getItem("icao-lang-pref") || "en";
   if (varName === "") {
     return languages[lang][key] ? languages[lang][key] : key;
   } else {

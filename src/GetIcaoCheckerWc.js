@@ -7,6 +7,8 @@ import { htmlTemplate } from "./scripts/htmlTemplate.js";
 
 window.icaoAppWC = {};
 icaoAppWC.isICAO = false;
+icaoAppWC.shadowRoot = null;
+icaoAppWC.language = "en";
 
 export function removeScript(src) {
   const scriptToRemove = document.querySelector(`script[src="${src}"]`);
@@ -79,54 +81,51 @@ export class GetIcaoCheckerWc extends LitElement {
     isICAOWC: { type: Boolean },
     openModalElmId: { type: String },
     savedImageElmId: { type: String },
+    language: { type: String },
     getImgSrc: { type: Function },
   };
 
   constructor() {
     super();
 
-    console.log("constructor version 1.3.6");
+    console.log("constructor version 1.4.12");
 
     this.isICAOWC = false;
-    this.openModalElmId = "open-icao-modal";
-    this.savedImageElmId = "cao-result-image";
+    this.language = "en";
+    this.openModalElmId = "";
+    this.savedImageElmId = "";
     this.getImgSrc = (src) => console.log({ src });
     // this.attachShadow({ mode: "open" });
     this.icaoRoot = this.attachShadow({ mode: "open" });
     console.log(this.icaoRoot);
 
-    const styles = document.createElement("style");
-    this.icaoRoot.appendChild(styles);
-
-    const loadStyle = async () => {
-      const request = await fetch("../src/styles.css");
-      const css = await request.text();
-      console.log(css);
-      styles.textContent = css;
-    };
-    loadStyle();
+    localStorage.setItem("icao-lang-pref", "en");
   }
 
   async connectedCallback() {
     // console.log(this.shadowRoot);
     // console.log(this.isICAOWC);
-    // console.log(this.openModalElmId);
-    // console.log(this.savedImageElmId);
+    console.log(this.openModalElmId);
+    console.log(this.language);
     // console.log(this.getImgSrc);
 
-    icaoAppWC.isICAO = this.isICAOWC;
+    icaoAppWC.isICAO = this.getAttribute("isICAOWC");
+    icaoAppWC.language = this.getAttribute("language") || "en";
+    icaoAppWC.openModalElmId = this.getAttribute("openModalElmId");
+    icaoAppWC.savedImageElmId = this.getAttribute("savedImageElmId");
     icaoAppWC.shadowRoot = this.shadowRoot;
+    console.log(icaoAppWC.language);
+    localStorage.setItem("icao-lang-pref", icaoAppWC.language);
     // console.log(icaoAppWC.isICAO);
 
     await initICAOModal(this.icaoRoot);
     try {
-      const openModalBtn = document.getElementById(
-        this.openModalBtnId ? this.openModalBtnId : "open-icao-modal"
-      );
+      console.log(icaoAppWC.openModalElmId);
+      const openModalBtn = document.getElementById(icaoAppWC.openModalElmId);
 
       if (!openModalBtn) {
         throw new Error(
-          `No element found to open the ICAO Modal, please check the 'data-open-modal-button-id' attribute`
+          `No element found to open the ICAO Modal, please check the value of the 'openModalElmId' attribute`
         );
       } else {
         openModalBtn.addEventListener(
@@ -136,9 +135,7 @@ export class GetIcaoCheckerWc extends LitElement {
       }
     } catch (error) {
       alert(error);
-      console.error(
-        `No element found to open the ICAO Modal, please check the 'data-open-modal-button-id' attribute`
-      );
+      console.error(error);
     }
     // handle saved image id
 
@@ -160,6 +157,7 @@ export class GetIcaoCheckerWc extends LitElement {
   }
 
   async openModalAndoadIcaoScripts() {
+    console.log(this.savedImageElm);
     this.shadowRoot
       .querySelector(".icao-modal-container")
       .classList.add("show");
