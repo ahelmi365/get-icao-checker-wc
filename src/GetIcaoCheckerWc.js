@@ -1,7 +1,7 @@
 import { html, css, LitElement } from "lit";
 // import {html, render} from 'https://esm.run/lit-html@1';
 import { StopWorker } from "./scripts/ICAOWorker.js";
-import { htmlTemplate } from "./scripts/htmlTemplate.js";
+// import { htmlTemplate } from "./scripts/htmlTemplate.js";
 
 // #region Common JS
 
@@ -62,7 +62,8 @@ export function loadStyle(href, shadowRoot) {
 }
 
 const initICAOModal = async (shadwoRoot) => {
-  const clonedIcaoHTML = htmlTemplate.content.cloneNode(true);
+  const htmlModule = await import("./scripts/htmlTemplate.js");
+  const clonedIcaoHTML = htmlModule.htmlTemplate.content.cloneNode(true);
 
   // Create modal structure
   const modal = document.createElement("div");
@@ -100,13 +101,9 @@ export class GetIcaoCheckerWc extends LitElement {
     this.openModalElmId = "";
     this.savedImageElmId = "";
     this.getImgSrc = (src) => console.log({ src });
-    console.log(this.getImgSrc);
 
     this.icaoRoot = this.attachShadow({ mode: "open" });
     icaoAppWC.shadowRoot = this.icaoRoot;
-    console.log(this.icaoRoot);
-
-    localStorage.setItem("icao-lang-pref", "en");
   }
 
   async connectedCallback() {
@@ -118,14 +115,8 @@ export class GetIcaoCheckerWc extends LitElement {
       this.getAttribute("savedImageElmId")
     );
 
-    console.log(icaoAppWC);
-
-    localStorage.setItem("icao-lang-pref", icaoAppWC.language);
-    // console.log(icaoAppWC.isICAO);
-
     await initICAOModal(this.icaoRoot);
     try {
-      console.log(icaoAppWC.openModalElmId);
       const openModalBtn = document.getElementById(icaoAppWC.openModalElmId);
 
       if (!openModalBtn) {
@@ -151,7 +142,6 @@ export class GetIcaoCheckerWc extends LitElement {
       .classList.add("show");
     // this.openModal(this);
     const { onICAOScriptLoad } = await import("./scripts/script.js");
-    console.log(this);
     onICAOScriptLoad(this.getImgSrc);
 
     window.addEventListener("icao-hidden.bs.modal", async () => {

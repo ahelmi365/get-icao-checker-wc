@@ -537,7 +537,7 @@ p.icao-reconnect-instrcutions {
 .icao-card-container span.tooltip-text {
   visibility: hidden;
   width: 250px;
-  background-color: black;
+  background-color: rgba(0,0,0,0.65);
   color: #fff;
   text-align: center;
   border-radius: 6px;

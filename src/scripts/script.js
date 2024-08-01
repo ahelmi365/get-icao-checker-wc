@@ -21,7 +21,7 @@ export const onICAOScriptLoad = async (getImgSrc) => {
     ClearICAOServiceThread,
     ConnectCamera,
     EnrolmentDevices,
-    FaceDetectedRectangleDrawingThread,
+    grapFrameIntervalId: FaceDetectedRectangleDrawingThread,
     GetConnectionState,
     Reconnect,
     RetrieveScripts,

@@ -2,6 +2,7 @@ var worker = null;
 var isWorkerStopped;
 let isIcaoCheckRunning = false;
 var isIcaoRunning = false;
+let workerIntervalId = null;
 export function StartWorker() {
   var webCamDevice = window.GetWebCameProvider();
 
@@ -10,39 +11,43 @@ export function StartWorker() {
   if (isWorkerStopped == true) {
     return;
   } else if (isWorkerStopped == false) {
-    window.setInterval(function () {
-      if (!isIcaoCheckRunning && !isWorkerStopped) {
-        var canvas = icaoAppWC.shadowRoot.getElementById("canvas");
-        if (canvas) {
-          var img = document.createElement("img_TempToSave");
-          img.src = canvas.toDataURL();
-          img.width = canvas.width;
-          img.height = canvas.height;
+    workerIntervalId = window.setInterval(handleWorkerInterval, 1000);
+  }
+}
 
-          isIcaoRunning = true;
+function handleWorkerInterval() {
+  {
+    if (!isIcaoCheckRunning && !isWorkerStopped) {
+      var canvas = icaoAppWC.shadowRoot.getElementById("canvas");
+      if (canvas) {
+        var img = document.createElement("img_TempToSave");
+        img.src = canvas.toDataURL();
+        img.width = canvas.width;
+        img.height = canvas.height;
 
-          if (!worker) {
-            worker = run(function () {
-              // worker.postMessage('I am a worker!');
-              // self.close();
-            });
-          }
-          worker.onmessage = (event) => {
-            isIcaoCheckRunning = true;
-            webCamDevice.ICOAChecking(img.src);
-            worker.terminate();
-            isIcaoRunning = false;
-          };
+        isIcaoRunning = true;
+
+        if (!worker) {
+          worker = run(function () {
+            // worker.postMessage('I am a worker!');
+            // self.close();
+          });
+        }
+        worker.onmessage = (event) => {
           isIcaoCheckRunning = true;
           webCamDevice.ICOAChecking(img.src);
-          worker.postMessage(img.src);
-          // worker.terminate();
-          if (document.getElementById("img_TempToSave")) {
-            document.removeChild(document.getElementById("img_TempToSave"));
-          }
+          worker.terminate();
+          isIcaoRunning = false;
+        };
+        isIcaoCheckRunning = true;
+        webCamDevice.ICOAChecking(img.src);
+        worker.postMessage(img.src);
+        // worker.terminate();
+        if (document.getElementById("img_TempToSave")) {
+          document.removeChild(document.getElementById("img_TempToSave"));
         }
       }
-    }, 200);
+    }
   }
 }
 
@@ -57,6 +62,8 @@ export function StopWorker() {
   if (worker != null) {
     worker.terminate();
     worker = null;
+    window.clearInterval(workerIntervalId);
+    workerIntervalId = null;
   }
 }
 

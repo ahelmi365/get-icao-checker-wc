@@ -80,8 +80,13 @@ const languages = {
     selectcamera: "Seleccionar cámara",
   },
 };
+
 export const t = (key, varName = "") => {
-  const lang = localStorage.getItem("icao-lang-pref") || "en";
+  const lang = window.icaoAppWC?.language;
+  if (!languages.hasOwnProperty(lang)) {
+    return languages["en"][key] ? languages["en"][key] : key;
+  }
+
   if (varName === "") {
     return languages[lang][key] ? languages[lang][key] : key;
   } else {

@@ -101,7 +101,7 @@ export const setIsCheckingICAOServiceThread = (value) => {
 };
 
 // const FaceDetectedRectangleDrawingThread = useRef(null);
-export let FaceDetectedRectangleDrawingThread;
+export let grapFrameIntervalId;
 // const [cachedCamera, setCachedCamera] = useState("");
 export let cachedCamera;
 export const setCachedCamera = (value) => {
@@ -218,7 +218,7 @@ export function StopCheckingICAOServiceThread() {
   setIsCheckingICAOServiceThread(false);
   StopCameraIndicatorInBrowser();
 
-  FaceDetectedRectangleDrawingThread = null;
+  grapFrameIntervalId = null;
   window.stream = null;
 }
 
@@ -381,13 +381,11 @@ export async function StartVideo() {
     }
   }
 
-  clearInterval(FaceDetectedRectangleDrawingThread);
-  FaceDetectedRectangleDrawingThread = null;
+  // clearInterval(faceDetectedRectangleDrawingThread);
+  // faceDetectedRectangleDrawingThread = null;
 
-  FaceDetectedRectangleDrawingThread = setInterval(() => {
+  grapFrameIntervalId = setInterval(() => {
     if (window.stream) {
-      // if (video.stream) {
-      // by Ali
       // console.log("window.stream running");
       grapFrame();
     }
@@ -396,6 +394,9 @@ export async function StartVideo() {
 // a function to stop video streaming from user's camera
 export function stopVideoStream() {
   console.log("stopVideoStream() is called");
+
+  window.clearInterval(grapFrameIntervalId);
+  grapFrameIntervalId = null;
   const videoElement = icaoAppWC.shadowRoot.getElementById("video");
   const stream = videoElement.srcObject;
   const tracks = stream?.getTracks();
@@ -410,9 +411,9 @@ export function stopVideoStream() {
 }
 
 // grapFrame
+const video = icaoAppWC.shadowRoot.getElementById("video");
+const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
 export function grapFrame() {
-  const video = icaoAppWC.shadowRoot.getElementById("video");
-  const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
   if (video) {
     // by Ali
     // canvas.width = video.videoWidth;
@@ -428,22 +429,6 @@ export function grapFrame() {
       canvas.width = resolutionWidth;
       canvas.height = resolutionHeight;
       ctx.drawImage(video, 0, 0, resolutionWidth, resolutionHeight);
-      //if (FaceFeatures[0]) {
-      // ctx.strokeStyle = 'green';
-      // ctx.lineWidth = 3;
-      // var p0 = FaceFeatures[0].faceCropRectangle[0];
-      // var p1 = FaceFeatures[0].faceCropRectangle[1];
-      // var p2 = FaceFeatures[0].faceCropRectangle[2];
-      // var p3 = FaceFeatures[0].faceCropRectangle[3];
-      // ctx.beginPath();
-      // ctx.moveTo(p0.X, p0.Y);
-      // ctx.lineTo(p1.X, p1.Y);
-      // ctx.lineTo(p3.X, p3.Y);
-      // ctx.lineTo(p2.X, p2.Y);
-      // ctx.closePath();
-      // ctx.stroke();
-      //}
-      // setTimeout(grapFrame, 1000 / 30);
     } else {
       pausedRequested = true;
     }
@@ -671,8 +656,9 @@ export async function Reconnect() {
 
 //CaptureImage
 export async function CaptureImage() {
-  clearInterval(FaceDetectedRectangleDrawingThread);
-  FaceDetectedRectangleDrawingThread = null;
+  window.clearInterval(grapFrameIntervalId);
+
+  grapFrameIntervalId = null;
 
   pausedRequested = true;
   StopWorker();
@@ -770,10 +756,8 @@ export function SaveCaptureedImg(getImgSrc) {
   const croppedImage = icaoAppWC.shadowRoot.getElementById("cropped");
   // updatePhotoImage(croppedImage.src);
   if (icaoAppWC.savedImageElm) {
-    console.log(icaoAppWC.savedImageElm);
     icaoAppWC.savedImageElm.src = croppedImage.src;
   }
-  console.log(getImgSrc);
   console.log(typeof getImgSrc);
   if (typeof getImgSrc === "function") {
     getImgSrc(croppedImage.src);
