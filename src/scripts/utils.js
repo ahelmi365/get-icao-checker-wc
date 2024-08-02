@@ -53,6 +53,9 @@ const captureImageBtnContainer = icaoAppWC.shadowRoot.getElementById(
 const saveCroppedImageContainer = icaoAppWC.shadowRoot.getElementById(
   "save-captured-image-btn-container"
 );
+const divICAOCheckingMessage = icaoAppWC.shadowRoot.getElementById(
+  "divICAOCheckingMessage"
+);
 saveCroppedImageContainer.style.display = "none";
 const connectCameraBtn =
   icaoAppWC.shadowRoot.getElementById("connect-camera-btn");
@@ -172,19 +175,19 @@ export function enumerateDevices(cachedConnectedCamera) {
           //     ...prevCameras,
           //     ...avCameras,
           //   }));
-          SetCachedConnectedCamera(avCameras, cachedConnectedCamera);
+          setCachedConnectedCamera(avCameras, cachedConnectedCamera);
           connectwithCameraFromLocalStorage();
           stream.getTracks().forEach((track) => {
             track.stop();
           });
-          // ConnectCamera(cachedConnectedCamera);
+          // connectCamera(cachedConnectedCamera);
           const selecetedCameraIDFromLocalStorage =
             getSelectedCameraFromLocalStorage();
           try {
             console.log(
               "Calling connectCamera() from utils - enumerateDevices()"
             );
-            ConnectCamera(selecetedCameraIDFromLocalStorage);
+            connectCamera(selecetedCameraIDFromLocalStorage);
           } catch (error) {
             console.log(error);
           }
@@ -206,8 +209,8 @@ export function enumerateDevices(cachedConnectedCamera) {
     });
 }
 
-// SetCachedConnectedCamera
-export function SetCachedConnectedCamera(avCameras, cachedConnectedCamera) {
+// setCachedConnectedCamera
+export function setCachedConnectedCamera(avCameras, cachedConnectedCamera) {
   let isCameraFound = false;
   Object.values(avCameras).forEach((element) => {
     if (element == cachedConnectedCamera) {
@@ -220,11 +223,11 @@ export function SetCachedConnectedCamera(avCameras, cachedConnectedCamera) {
   }
 }
 
-// StopCheckingICAOServiceThread
-export function StopCheckingICAOServiceThread() {
+// stopCheckingICAOServiceThread
+export function stopCheckingICAOServiceThread() {
   clearICAOServiceThread();
   setIsCheckingICAOServiceThread(false);
-  StopCameraIndicatorInBrowser();
+  stopCameraIndicatorInBrowser();
 
   icaoAppWC.grapFrameIntervalId = null;
   window.stream = null;
@@ -249,9 +252,9 @@ export function getWebCamDevice() {
 }
 
 // ConnectCamera
-export function ConnectCamera(camera) {
+export function connectCamera(camera) {
   setIsLiveIcaoData(true);
-  console.log("INSIDE-ConnectCamera() is called");
+  console.log("INSIDE-connectCamera() is called");
   try {
     setIsPhotoCaptured(false);
     connectCameraBtnContainer.style.display = "none";
@@ -272,7 +275,7 @@ export function ConnectCamera(camera) {
     }
     pausedRequested = false;
 
-    StartVideo();
+    startVideo();
 
     if (icaoAppWC.isICAO) {
       StartWorker();
@@ -298,7 +301,7 @@ let preferredResolutions = [
   // Add more resolutions as needed
 ];
 
-export async function StartVideo() {
+export async function startVideo() {
   console.log("Started the video()"); // by Ali
 
   // method load() resets the media element to its initial state
@@ -317,7 +320,7 @@ export async function StartVideo() {
   //   });
   // }
 
-  StopCameraIndicatorInBrowser(); // by Ali
+  stopCameraIndicatorInBrowser(); // by Ali
 
   const videoSource = selectedCamera;
   const constraints = {
@@ -589,9 +592,7 @@ const updateTooltipText = (toolTipId, faceFeaturesStatus, index, icaoItem) => {
 //  StyleICAOFeatureRow() // to draw the table, not needed , commented by Ali
 
 // DisplayICAOCheckingMessage
-const divICAOCheckingMessage = icaoAppWC.shadowRoot.getElementById(
-  "divICAOCheckingMessage"
-);
+
 if (!icaoAppWC.isICAO) {
   divICAOCheckingMessage.style.display = "none";
 }
@@ -614,7 +615,7 @@ export function displayICAOCheckingMessage(message) {
   }
 }
 
-export function RetrieveScripts(scriptsURL) {
+export function retrieveScripts(scriptsURL) {
   for (let i = 0; i < scriptsURL.length; i++) {
     const scriptToRemove = document.querySelector(
       `script[src="${scriptsURL[i]}"]`
@@ -629,11 +630,11 @@ export function RetrieveScripts(scriptsURL) {
 }
 
 // Reconnect
-export async function Reconnect() {
+export async function reconnect() {
   console.log("Reconnect ()");
   if (icaoAppWC.isICAO) {
     if (serviceProxyForWebCam == null) {
-      RetrieveScripts(EnrolmentDevices.WebCam.Scripts);
+      retrieveScripts(EnrolmentDevices.WebCam.Scripts);
       console.log("serviceproxyforwebacm  = null");
     }
     try {
@@ -652,7 +653,7 @@ export async function Reconnect() {
 }
 
 //CaptureImage
-export async function CaptureImage() {
+export async function captureImage() {
   window.clearInterval(icaoAppWC.grapFrameIntervalId);
   console.log(icaoAppWC.grapFrameIntervalId);
 
@@ -704,12 +705,7 @@ export async function CaptureImage() {
         saveCroppedImageContainer.style.display = "flex";
       };
       croppedimg.src = GetCropImageResult;
-
-      // btnSaveCaptureImage.disabled = false;
-
-      // stopWindowStreaming(); // by Ali
-
-      // Set window.stream to null
+      console.log("calling stopvideo from captureImage()");
       stopVideoStream();
       window.stream = null; // by Ali
 
@@ -741,8 +737,8 @@ export async function CaptureImage() {
 }
 
 // SaveCaptureedImg
-export function SaveCaptureedImg(getImgSrc) {
-  StopCameraIndicatorInBrowser();
+export function saveCaptureedImg(getImgSrc) {
+  stopCameraIndicatorInBrowser();
   clearICAOServiceThread();
   // updatePhotoImage(croppedimg.src);
   if (icaoAppWC.savedImageElm) {
@@ -752,12 +748,13 @@ export function SaveCaptureedImg(getImgSrc) {
   if (typeof getImgSrc === "function") {
     getImgSrc(croppedimg.src);
   }
+  console.log("calling stopvideo from saveCaptureedImg()");
   stopVideoStream();
   croppedimg.style.display = "none";
 }
 
 // StopCameraIndicatorInBrowser
-export function StopCameraIndicatorInBrowser() {
+export function stopCameraIndicatorInBrowser() {
   if (window?.stream) {
     // stopVideoStream();
     window?.stream.getTracks().forEach((track) => {
@@ -840,7 +837,7 @@ export const connectwithCameraFromLocalStorage = () => {
   console.log(
     "Calling connectCamera() from utils - connectwithCameraFromLocalStorage()"
   );
-  ConnectCamera(selecetedCameraIDFromLocalStorage);
+  connectCamera(selecetedCameraIDFromLocalStorage);
 };
 export function handleChangeInAvaliableCameras(selectedValue) {
   console.log("handle Change In Avaliable Cameras");
@@ -864,7 +861,7 @@ export function handleChangeInAvaliableCameras(selectedValue) {
 
   setSelectedCamera(selectedValue);
   setCachedCamera(selectedValue);
-  // ConnectCamera(e.target.value);
+  // connectCamera(e.target.value);
 }
 
 let showSelectedCamera;

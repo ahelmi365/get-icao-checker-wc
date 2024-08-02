@@ -158,6 +158,7 @@ export class GetIcaoCheckerWc extends LitElement {
       // setIsCheckingICAOServiceThread(false);
       StopWorker();
       reestCashedArray();
+      console.log("calling stopvideo from openModalAndoadIcaoScripts()");
       stopVideoStream();
       clearICAOServiceThread(utils.CheckingICAOServiceThread);
 

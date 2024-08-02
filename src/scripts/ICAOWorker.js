@@ -4,6 +4,7 @@ let isIcaoCheckRunning = false;
 var isIcaoRunning = false;
 let workerIntervalId = null;
 export function StartWorker() {
+  console.log("=>>>>>> Start-Worker() is called");
   var webCamDevice = window.GetWebCameProvider();
 
   isWorkerStopped = false;
@@ -61,6 +62,7 @@ function run(fn) {
 }
 
 export function StopWorker() {
+  console.log("=>>>>>> StopWorker() is called");
   isWorkerStopped = true;
   isIcaoCheckRunning = false;
   if (worker != null) {

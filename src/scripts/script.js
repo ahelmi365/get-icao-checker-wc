@@ -3,32 +3,24 @@
 // ---------------- apply effects ----------------------
 export const onICAOScriptLoad = async (getImgSrc) => {
   var {
-    CaptureImage,
-    clearICAOServiceThread,
-    ConnectCamera,
+    captureImage,
+    connectCamera,
     EnrolmentDevices,
     getICAOServiceConnectionState,
-    Reconnect,
-    RetrieveScripts,
-    SaveCaptureedImg,
-    StopCameraIndicatorInBrowser,
-    StopCheckingICAOServiceThread,
+    reconnect,
+    retrieveScripts,
+    saveCaptureedImg,
     cachedCamera,
     connectwithCameraFromLocalStorage,
     enumerateDevices,
     getSelectedCameraFromLocalStorage,
     handleChangeInAvaliableCameras,
     handleFullScreenChange,
-    isCheckingICAOServiceThread,
     reestCashedArray,
     setCachedCamera,
     setIsCheckingICAOServiceThread,
-    stopVideoStream,
     toggleFullScreen,
     onLoadUtils,
-    icaoServiceConnectionStateIntervalId,
-
-    utils,
   } = await import("./utils.js");
 
   onLoadUtils();
@@ -42,7 +34,7 @@ export const onICAOScriptLoad = async (getImgSrc) => {
   // icaoAppWC.shadowRoot.addEventListener("keydown", handleKeyDown);
   if (icaoAppWC.isICAO) {
     try {
-      RetrieveScripts(EnrolmentDevices.WebCam.Scripts);
+      retrieveScripts(EnrolmentDevices.WebCam.Scripts);
     } catch (error) {
       console.log(error);
     }
@@ -120,11 +112,11 @@ export const onICAOScriptLoad = async (getImgSrc) => {
     window.dispatchEvent(new Event("icao-hidden.bs.modal"));
   }
   saveImageBtn.addEventListener("click", () => {
-    SaveCaptureedImg(getImgSrc);
+    saveCaptureedImg(getImgSrc);
     closeICAOModal();
   });
   reconnectIcaoBtn.addEventListener("click", () => {
-    Reconnect();
+    reconnect();
   });
 
   toggleFullScreenBtn.addEventListener("click", () => {
@@ -152,9 +144,9 @@ export const onICAOScriptLoad = async (getImgSrc) => {
       getSelectedCameraFromLocalStorage();
     try {
       console.log(
-        "calling ConnectCamera() from scripts on connectBTN is clicked"
+        "calling connectCamera() from scripts on connectBTN is clicked"
       );
-      ConnectCamera(selecetedCameraIDFromLocalStorage);
+      connectCamera(selecetedCameraIDFromLocalStorage);
       // getICAOServiceConnectionState();
     } catch (error) {
       console.log(error);
@@ -163,7 +155,7 @@ export const onICAOScriptLoad = async (getImgSrc) => {
 
   captureImageBtn.addEventListener("click", () => {
     console.log("captureImageBtn is clicked");
-    CaptureImage();
+    captureImage();
   });
 
   modalCloseBtn.addEventListener("click", () => {
