@@ -1,6 +1,5 @@
 import { html, css, LitElement } from "lit";
 // import {html, render} from 'https://esm.run/lit-html@1';
-import { StopWorker } from "./scripts/ICAOWorker.js";
 // import { htmlTemplate } from "./scripts/htmlTemplate.js";
 
 // #region Common JS
@@ -153,6 +152,7 @@ export class GetIcaoCheckerWc extends LitElement {
         utils,
         EnrolmentDevices,
       } = await import("./scripts/utils.js");
+      const { StopWorker } = await import("./scripts/ICAOWorker.js");
       // const myUtils = (await import("./utils.js")).utils;
       // TODO: check this one belwo
       // setIsCheckingICAOServiceThread(false);
