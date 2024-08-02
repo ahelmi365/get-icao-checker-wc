@@ -56,7 +56,6 @@ function handleWorkerInterval() {
   }
 }
 
-var fn = "http://localhost:9002/scripts/worker.js";
 function run(fn) {
   return new Worker(URL.createObjectURL(new Blob(["(" + fn + ")()"])));
 }
