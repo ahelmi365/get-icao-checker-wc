@@ -11,42 +11,47 @@ export function StartWorker() {
   if (isWorkerStopped == true) {
     return;
   } else if (isWorkerStopped == false) {
+    if (!worker) {
+      worker = run(function () {
+        // worker.postMessage('I am a worker!');
+        // self.close();
+      });
+    }
     workerIntervalId = window.setInterval(handleWorkerInterval, 1000);
   }
 }
 
+const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
+const img = document.createElement("img");
 function handleWorkerInterval() {
-  {
-    if (!isIcaoCheckRunning && !isWorkerStopped) {
-      var canvas = icaoAppWC.shadowRoot.getElementById("canvas");
-      if (canvas) {
-        var img = document.createElement("img_TempToSave");
-        img.src = canvas.toDataURL();
-        img.width = canvas.width;
-        img.height = canvas.height;
+  if (!isIcaoCheckRunning && !isWorkerStopped) {
+    if (canvas) {
+      img.src = canvas.toDataURL();
+      img.width = canvas.width;
+      img.height = canvas.height;
 
-        isIcaoRunning = true;
+      isIcaoRunning = true;
 
-        if (!worker) {
-          worker = run(function () {
-            // worker.postMessage('I am a worker!');
-            // self.close();
-          });
-        }
-        worker.onmessage = (event) => {
-          isIcaoCheckRunning = true;
-          webCamDevice.ICOAChecking(img.src);
-          worker.terminate();
-          isIcaoRunning = false;
-        };
-        isIcaoCheckRunning = true;
-        webCamDevice.ICOAChecking(img.src);
-        worker.postMessage(img.src);
-        // worker.terminate();
-        if (document.getElementById("img_TempToSave")) {
-          document.removeChild(document.getElementById("img_TempToSave"));
-        }
-      }
+      // if (!worker) {
+      //   worker = run(function () {
+      //     // worker.postMessage('I am a worker!');
+      //     // self.close();
+      //   });
+      // }
+      // worker.onmessage = (event) => {
+      //   console.log({ event });
+      //   isIcaoCheckRunning = true;
+      //   webCamDevice.ICOAChecking(img.src);
+      //   // worker.terminate();
+      //   isIcaoRunning = false;
+      // };
+      isIcaoCheckRunning = true;
+      webCamDevice.ICOAChecking(img.src);
+      // worker.postMessage(img.src);
+      // worker.terminate();
+      // if (document.getElementById("img_TempToSave")) {
+      //   document.removeChild(document.getElementById("img_TempToSave"));
+      // }
     }
   }
 }
