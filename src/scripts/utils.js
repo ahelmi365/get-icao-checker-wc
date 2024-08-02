@@ -175,6 +175,9 @@ export function enumerateDevices(cachedConnectedCamera) {
           const selecetedCameraIDFromLocalStorage =
             getSelectedCameraFromLocalStorage();
           try {
+            console.log(
+              "Calling connectCamera() from utils - enumerateDevices()"
+            );
             ConnectCamera(selecetedCameraIDFromLocalStorage);
           } catch (error) {
             console.log(error);
@@ -242,6 +245,7 @@ export function getWebCamDevice() {
 // ConnectCamera
 export function ConnectCamera(camera) {
   setIsLiveIcaoData(true);
+  console.log("INSIDE-ConnectCamera() is called");
   try {
     setIsPhotoCaptured(false);
     connectCameraBtnContainer.style.display = "none";
@@ -261,7 +265,9 @@ export function ConnectCamera(camera) {
       StopWorker();
     }
     pausedRequested = false;
+
     StartVideo();
+
     // icaoAppWC.shadowRoot.getElementById("btnSaveCaptureImage").disabled = true;
     if (icaoAppWC.isICAO) {
       StartWorker();
@@ -294,17 +300,16 @@ let preferredResolutions = [
   // Add more resolutions as needed
 ];
 
-// startVideo()
+// const video = icaoAppWC.shadowRoot.getElementById("video");
+const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
 export async function StartVideo() {
-  // console.log("Started the video"); // by Ali
+  console.log("Started the video()"); // by Ali
 
-  const video = icaoAppWC.shadowRoot.getElementById("video");
   // method load() resets the media element to its initial state
   // and begins the process of selecting a media source and loading the media in preparation for playback
   // to begin at the beginning.
   video.load();
 
-  const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
   canvas.width = resolutionWidth;
   canvas.height = resolutionHeight; //video.videoHeight;//"400";//
 
@@ -318,11 +323,6 @@ export async function StartVideo() {
   // }
 
   StopCameraIndicatorInBrowser(); // by Ali
-  // if (window?.stream) {
-  //   window?.stream.getTracks().forEach((track) => {
-  //     track.stop();
-  //   });
-  // }
 
   const videoSource = selectedCamera;
   const constraints = {
@@ -381,20 +381,24 @@ export async function StartVideo() {
 
   // clearInterval(faceDetectedRectangleDrawingThread);
   // faceDetectedRectangleDrawingThread = null;
+  window.clearInterval(icaoAppWC.grapFrameIntervalId);
 
   icaoAppWC.grapFrameIntervalId = setInterval(() => {
+    // console.log(icaoAppWC.grapFrameIntervalId);
     if (window.stream) {
       // console.log("window.stream running");
       grapFrame();
     }
   }, 1000 / 30);
+  console.log(icaoAppWC.grapFrameIntervalId);
 }
 // a function to stop video streaming from user's camera
 export function stopVideoStream() {
   console.log("stopVideoStream() is called");
-
+  console.log(icaoAppWC.grapFrameIntervalId);
   window.clearInterval(icaoAppWC.grapFrameIntervalId);
-  icaoAppWC.grapFrameIntervalId = null;
+  // icaoAppWC.grapFrameIntervalId = null;
+
   const videoElement = icaoAppWC.shadowRoot.getElementById("video");
   const stream = videoElement.srcObject;
   const tracks = stream?.getTracks();
@@ -410,7 +414,7 @@ export function stopVideoStream() {
 
 // grapFrame
 const video = icaoAppWC.shadowRoot.getElementById("video");
-const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
+// const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
 export function grapFrame() {
   if (video) {
     // by Ali
@@ -658,15 +662,16 @@ export async function Reconnect() {
 //CaptureImage
 export async function CaptureImage() {
   window.clearInterval(icaoAppWC.grapFrameIntervalId);
+  console.log(icaoAppWC.grapFrameIntervalId);
 
-  icaoAppWC.grapFrameIntervalId = null;
+  // icaoAppWC.grapFrameIntervalId = null;
 
   pausedRequested = true;
   StopWorker();
   const video = icaoAppWC.shadowRoot.getElementById("video");
   video.pause();
 
-  const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
+  // const canvas = icaoAppWC.shadowRoot.getElementById("canvas");
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video, 0, 0, resolutionWidth, resolutionHeight);
 
@@ -785,7 +790,7 @@ icaoAppWC.icaoServiceConnectionStateIntervalId = "test";
 export async function getICAOServiceConnectionState() {
   if (isCheckingICAOServiceThread && icaoAppWC.isICAO) {
     icaoAppWC.icaoServiceConnectionStateIntervalId = setInterval(async () => {
-      console.log("GetConnectionState() is called");
+      // console.log("GetConnectionState() is called");
       serviceProxyForWebCam = window.serviceProxyForWebCam;
 
       if (typeof serviceProxyForWebCam == "undefined") {
@@ -851,6 +856,9 @@ export const connectwithCameraFromLocalStorage = () => {
   } else {
     avaliableCamerasSelect.value = selecetedCameraIDFromLocalStorage;
   }
+  console.log(
+    "Calling connectCamera() from utils - connectwithCameraFromLocalStorage()"
+  );
   ConnectCamera(selecetedCameraIDFromLocalStorage);
 };
 export function handleChangeInAvaliableCameras(selectedValue) {

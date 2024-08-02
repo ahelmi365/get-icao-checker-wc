@@ -151,6 +151,9 @@ export const onICAOScriptLoad = async (getImgSrc) => {
     const selecetedCameraIDFromLocalStorage =
       getSelectedCameraFromLocalStorage();
     try {
+      console.log(
+        "calling ConnectCamera() from scripts on connectBTN is clicked"
+      );
       ConnectCamera(selecetedCameraIDFromLocalStorage);
       // getICAOServiceConnectionState();
     } catch (error) {
