@@ -1,9 +1,8 @@
-import { html, css, LitElement } from "lit";
+import { LitElement } from "lit";
+
 // import {html, render} from 'https://esm.run/lit-html@1';
 // import { htmlTemplate } from "./scripts/htmlTemplate.js";
-
-// #region Common JS
-
+const webCamScriptDomainName = "http://localhost:9002";
 window.icaoAppWC = {
   isICAO: false,
   shadowRoot: null,
@@ -13,53 +12,16 @@ window.icaoAppWC = {
   getImgSrc: null,
 };
 
-export function removeScript(src) {
-  const scriptToRemove = document.querySelector(`script[src="${src}"]`);
-
-  if (scriptToRemove) {
-    scriptToRemove.remove();
-  }
-}
-export function removeStyleSheet(href) {
-  const styleSheetToRemove = document.querySelector(`link[href="${href}"]`);
-  if (styleSheetToRemove) {
-    styleSheetToRemove.remove();
-  }
-}
-
-export function loadScript(src, shadowRoot) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve();
-    } else {
-      const script = document.createElement("script");
-      script.src = src;
-      script.type = "module";
-      script.defer = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error(`Failed to load script ${src}`));
-      // document.head.appendChild(script);
-      shadowRoot.appendChild(script);
-    }
-  });
-}
-
-export function loadStyle(href, shadowRoot) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`link[href="${href}"]`)) {
-      resolve();
-    } else {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = href;
-      link.onload = () => resolve();
-      link.onerror = () => reject(new Error(`Failed to load style ${href}`));
-      // document.head.appendChild(link);
-      shadowRoot.appendChild(link);
-    }
-  });
-}
-
+window.EnrolmentDevices = {
+  WebCam: {
+    Scripts: [
+      `${webCamScriptDomainName}/scripts/jquery-1.6.4.min.js`,
+      `${webCamScriptDomainName}/scripts/getsoass.js`,
+      `${webCamScriptDomainName}/scripts/jquery.signalR-1.2.2.js`,
+      `${webCamScriptDomainName}/scripts/hub.js`,
+    ],
+  },
+};
 const initICAOModal = async (shadwoRoot) => {
   const htmlModule = await import("./scripts/htmlTemplate.js");
   const clonedIcaoHTML = htmlModule.htmlTemplate.content.cloneNode(true);
@@ -74,11 +36,6 @@ const initICAOModal = async (shadwoRoot) => {
 
   shadwoRoot.appendChild(modal);
 };
-
-// #endregion
-// #region inedx.js
-
-// #endregion
 
 export class GetIcaoCheckerWc extends LitElement {
   static get properties() {
@@ -104,7 +61,18 @@ export class GetIcaoCheckerWc extends LitElement {
     this.icaoRoot = this.attachShadow({ mode: "open" });
     icaoAppWC.shadowRoot = this.icaoRoot;
   }
+  handleBeforeUnload = (icaoRoot) => {
+    EnrolmentDevices.WebCam.Scripts.map((script) => {
+      // removeScript(script);
+      const scriptToRemove = icaoRoot.querySelector(`script[src="${script}"]`);
 
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    });
+    // delete window.icaoAppWC;
+    // delete window.EnrolmentDevices;
+  };
   async connectedCallback() {
     icaoAppWC.isICAO = this.hasAttribute("isICAOWC");
     icaoAppWC.language = this.getAttribute("language") || "en";
@@ -132,7 +100,12 @@ export class GetIcaoCheckerWc extends LitElement {
       alert(error);
       console.error(error);
     }
+
     // handle saved image id
+    window.addEventListener(
+      "beforeunload",
+      this.handleBeforeUnload(this.icaoRoot)
+    );
   }
 
   async openModalAndoadIcaoScripts() {
@@ -145,12 +118,10 @@ export class GetIcaoCheckerWc extends LitElement {
 
     window.addEventListener("icao-hidden.bs.modal", async () => {
       const {
-        setIsCheckingICAOServiceThread,
         reestCashedArray,
         stopVideoStream,
         clearICAOServiceThread,
         utils,
-        EnrolmentDevices,
       } = await import("./scripts/utils.js");
       // StopWorker();
       reestCashedArray();
@@ -158,19 +129,6 @@ export class GetIcaoCheckerWc extends LitElement {
       clearICAOServiceThread(utils.CheckingICAOServiceThread);
 
       window.stream = null;
-
-      removeScript("./scripts/script.js");
-      removeScript("./scripts/utils.js");
-      EnrolmentDevices.WebCam.Scripts.map((script) => {
-        // removeScript(script);
-        const scriptToRemove = this.icaoRoot.querySelector(
-          `script[src="${script}"]`
-        );
-
-        if (scriptToRemove) {
-          scriptToRemove.remove();
-        }
-      });
     });
   }
 

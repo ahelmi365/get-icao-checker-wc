@@ -1,8 +1,6 @@
 import { t } from "../i18n/translate.js";
 // console.log(window.icaoAppWC);
 // set the backendURL
-const webCamScriptDomainName = "http://localhost:9002";
-const backendURL = "http://localhost:9002";
 
 const IcaoAttributesValues = {
   TOO_LOW: "TooLow",
@@ -18,17 +16,6 @@ const icaoStatusInstructions = icaoAppWC.shadowRoot.getElementById(
 if (icaoStatusInstructions) {
   icaoStatusInstructions.style.display = "none";
 }
-
-export const EnrolmentDevices = {
-  WebCam: {
-    Scripts: [
-      `${webCamScriptDomainName}/scripts/jquery-1.6.4.min.js`,
-      `${webCamScriptDomainName}/scripts/getsoass.js`,
-      `${webCamScriptDomainName}/scripts/jquery.signalR-1.2.2.js`,
-      `${webCamScriptDomainName}/scripts/hub.js`,
-    ],
-  },
-};
 
 const leftFeatures = icaoAppWC.shadowRoot.getElementById("left-features");
 const rightFeatures = icaoAppWC.shadowRoot.getElementById("right-features");
@@ -80,8 +67,8 @@ const setAvailableCameras = (newCamera) => {
 };
 
 let pausedRequested = false;
-export let webCamDevice = null;
-let serviceProxyForWebCam;
+// export let webCamDevice = null;
+// let serviceProxyForWebCam;
 
 // const [loading, setLoading] = useState(false);
 let loading;
@@ -93,8 +80,15 @@ const setIsPhotoCaptured = () => {};
 export let isDeviceAvailable = true;
 const setIsDeviceAvailable = () => {};
 // const [isDeviceConnected, setIsDeviceConnected] = useState(false);
-export let isDeviceConnected;
-const setIsDeviceConnected = () => {};
+export let isDeviceConnected = false;
+const setIsDeviceConnected = (val) => {
+  isDeviceConnected = val;
+};
+
+let isICAOSeriveActive = false;
+const setIsICAOSeriveActive = (val) => {
+  isICAOSeriveActive = val;
+};
 // const CheckingICAOServiceThread = useRef();
 var CheckingICAOServiceThread = null;
 // const [isCheckingICAOServiceThread, setIsCheckingICAOServiceThread] = useState(true);
@@ -127,6 +121,7 @@ export const onLoadUtils = () => {
 // #region functions
 // enumerateDevices
 export function enumerateDevices(cachedConnectedCamera) {
+  // console.log("======== enumerateDevices() is called");
   setLoading(true);
   let avCameras = {};
   navigator.mediaDevices
@@ -278,6 +273,10 @@ export function connectCamera(camera) {
     addSelectedCameraToLocalStorage(camera);
   } catch (error) {
     console.log("error from connect camera", error);
+    // icaoStatusInstructions.style.display = "flex";
+    // connectCameraBtn.disabled = true;
+    // captureImageBtn.disabled = true;
+    // lblMessageErrorElm.innerText = t("WebCamserviceisnotstarted");
   }
 }
 
@@ -563,7 +562,7 @@ const enableDisableCameraButtons = (
     connectCameraBtn.disabled = true;
     captureImageBtn.disabled = true;
     displayICAOCheckingMessage(t("IcaoErrorMessage"));
-    setIsDeviceConnected(false);
+    // setIsDeviceConnected(false);
   }
 };
 // showYawRollPitchErrorMessage
@@ -661,16 +660,16 @@ export function displayICAOCheckingMessage(message) {
       divICAOCheckingMessage.style.display = "none";
       captureImageBtn.disabled = false;
     }
-    setIsDeviceConnected(false);
+    // setIsDeviceConnected(false);
   }
 }
 
 export function retrieveScripts(scriptsURL) {
   for (let i = 0; i < scriptsURL.length; i++) {
-    const scriptToRemove = document.querySelector(
+    const isScriptExist = icaoAppWC.shadowRoot.querySelector(
       `script[src="${scriptsURL[i]}"]`
     );
-    if (!scriptToRemove) {
+    if (!isScriptExist) {
       const script = document.createElement("script");
       script.src = scriptsURL[i];
       script.async = false;
@@ -679,27 +678,52 @@ export function retrieveScripts(scriptsURL) {
   }
 }
 
+export function removeAllICAOScripts(scriptsURL) {
+  for (let i = 0; i < scriptsURL.length; i++) {
+    const isScriptExist = icaoAppWC.shadowRoot.querySelector(
+      `script[src="${scriptsURL[i]}"]`
+    );
+    if (isScriptExist) {
+      isScriptExist.remove();
+    }
+  }
+}
+
 // Reconnect
 export async function reconnect() {
   console.log("Reconnect ()");
   if (icaoAppWC.isICAO) {
-    if (serviceProxyForWebCam == null) {
+    // console.log(serviceProxyForWebCam ?? undefined);
+    if (window.serviceProxyForWebCam == null) {
+      removeAllICAOScripts(EnrolmentDevices.WebCam.Scripts);
       retrieveScripts(EnrolmentDevices.WebCam.Scripts);
       console.log("serviceproxyforwebacm  = null");
     }
+    setIsICAOSeriveActive(false);
     try {
-      console.log("Reconnect Try Block");
+      console.log("======= in Reconnect Try Block");
       serviceProxyForWebCam.Connection.start(
         { transport: ["webSockets"], waitForPageLoad: true },
-
         function () {
-          console.log("connection re-established!");
+          console.log("connection re-established! =============");
         }
       ).done(function (result) {
+        console.log({ result });
         console.log("re-connecting is done!");
+        handleConnectionSuccess(result);
+        enumerateDevices(cachedCamera);
       });
-    } catch (exe) {}
+      console.log("======end of Reconnect try block");
+    } catch (exe) {
+      console.log("=========in Reconnect catch block");
+      console.log({ exe });
+    }
   }
+}
+
+function handleConnectionSuccess(result) {
+  console.log("Handling connection success with result:", result);
+  // Additional code here
 }
 
 //CaptureImage
@@ -867,10 +891,13 @@ icaoAppWC.icaoServiceConnectionStateIntervalId = "test";
 export async function getICAOServiceConnectionState() {
   if (isCheckingICAOServiceThread && icaoAppWC.isICAO) {
     icaoAppWC.icaoServiceConnectionStateIntervalId = setInterval(async () => {
-      // console.log("GetConnectionState() is called");
-      serviceProxyForWebCam = window.serviceProxyForWebCam;
+      // serviceProxyForWebCam = window.serviceProxyForWebCam ?? undefined;
 
-      if (typeof serviceProxyForWebCam == "undefined") {
+      if (
+        typeof serviceProxyForWebCam == "undefined" ||
+        window.serviceProxyForWebCam === undefined
+      ) {
+        console.log(window.serviceProxyForWebCam);
         icaoStatusInstructions.style.display = "flex";
         connectCameraBtn.disabled = true;
         captureImageBtn.disabled = true;
@@ -888,7 +915,11 @@ export async function getICAOServiceConnectionState() {
           if (response && response.Result) {
             icaoStatusInstructions.style.display = "none";
             connectCameraBtn.disabled = false;
-            // captureImageBtn.disabled = false;
+            // reconnect camera if not connected
+            if (!isICAOSeriveActive) {
+              connectCamera(cachedCamera);
+              setIsICAOSeriveActive(true);
+            }
             return (lblMessageErrorElm.innerText = t("ICAOserviceisConnected"));
           } else {
             icaoStatusInstructions.style.display = "flex";

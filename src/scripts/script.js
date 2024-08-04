@@ -5,7 +5,6 @@ export const onICAOScriptLoad = async (getImgSrc) => {
   var {
     captureImage,
     connectCamera,
-    EnrolmentDevices,
     getICAOServiceConnectionState,
     reconnect,
     retrieveScripts,
@@ -22,7 +21,13 @@ export const onICAOScriptLoad = async (getImgSrc) => {
     toggleFullScreen,
     onLoadUtils,
   } = await import("./utils.js");
-
+  if (icaoAppWC.isICAO) {
+    try {
+      retrieveScripts(EnrolmentDevices.WebCam.Scripts);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   onLoadUtils();
 
   reestCashedArray();
@@ -32,13 +37,6 @@ export const onICAOScriptLoad = async (getImgSrc) => {
     handleFullScreenChange
   );
   // icaoAppWC.shadowRoot.addEventListener("keydown", handleKeyDown);
-  if (icaoAppWC.isICAO) {
-    try {
-      retrieveScripts(EnrolmentDevices.WebCam.Scripts);
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   const selecetedCameraIDFromLocalStorage = getSelectedCameraFromLocalStorage();
 
