@@ -299,15 +299,9 @@ export async function startVideo() {
   video.load();
 
   canvas.width = resolutionWidth;
-  canvas.height = resolutionHeight; //video.videoHeight;//"400";//
+  canvas.height = resolutionHeight;
 
   video.style.display = "inline";
-
-  // if ((<any>window).stream) {
-  //   (<any>window).stream.getTracks().forEach(track => {
-  // 	track.stop();
-  //   });
-  // }
 
   stopCameraIndicatorInBrowser();
 
@@ -315,26 +309,28 @@ export async function startVideo() {
   const constraints = {
     video: {
       deviceId: videoSource ? { exact: videoSource } : undefined,
-      width: 640,
-      height: 480,
     },
   };
   let mediaStream = null;
   try {
-    // for (let resolution of preferredResolutions) {
-    //   constraints.video = {
-    //     ...constraints.video,
-    //     width: resolution.width,
-    //     height: resolution.height,
-    //   };
+    for (let resolution of preferredResolutions) {
+      constraints.video = {
+        ...constraints.video,
+        width: resolution.width,
+        height: resolution.height,
+      };
 
-    //   try {
-    //     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-    //     break; // Break out of the loop if successful
-    //   } catch (error) {
-    //     // Continue trying with the next resolution
-    //   }
-    // }
+      try {
+        // console.log(resolution.width);
+        // console.log(resolution.height);
+        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+        // console.log({ resolution });
+        // console.log({ mediaStream });
+        break; // Break out of the loop if successful
+      } catch (error) {
+        // Continue trying with the next resolution
+      }
+    }
     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
 
     window.stream = mediaStream;
