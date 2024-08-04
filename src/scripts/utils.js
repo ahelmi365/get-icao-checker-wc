@@ -274,7 +274,7 @@ export function connectCamera(camera) {
       StopWorker();
     }
     pausedRequested = false;
-
+    console.log("calling StartVideo() from connect Camera");
     startVideo();
 
     if (icaoAppWC.isICAO) {
@@ -291,8 +291,8 @@ export function connectCamera(camera) {
   }
 }
 
-var resolutionWidth = 0;
-var resolutionHeight = 0;
+let resolutionWidth = 640;
+let resolutionHeight = 480;
 
 let preferredResolutions = [
   { width: 1920, height: 1080 },
@@ -326,23 +326,27 @@ export async function startVideo() {
   const constraints = {
     video: {
       deviceId: videoSource ? { exact: videoSource } : undefined,
+      width: 640,
+      height: 480,
     },
   };
   let mediaStream = null;
   try {
-    for (let resolution of preferredResolutions) {
-      constraints.video = {
-        width: resolution.width,
-        height: resolution.height,
-      };
+    // for (let resolution of preferredResolutions) {
+    //   constraints.video = {
+    //     ...constraints.video,
+    //     width: resolution.width,
+    //     height: resolution.height,
+    //   };
 
-      try {
-        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-        break; // Break out of the loop if successful
-      } catch (error) {
-        // Continue trying with the next resolution
-      }
-    }
+    //   try {
+    //     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+    //     break; // Break out of the loop if successful
+    //   } catch (error) {
+    //     // Continue trying with the next resolution
+    //   }
+    // }
+    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
 
     window.stream = mediaStream;
     video.srcObject = mediaStream;
@@ -415,6 +419,7 @@ export function grapFrame() {
     // by Ali
     // canvas.width = video.videoWidth;
     // canvas.height = "400"; //video.videoHeight;//"400";//
+
     canvas.width = resolutionWidth;
     canvas.height = resolutionHeight;
 
@@ -654,7 +659,7 @@ export async function reconnect() {
 
 //CaptureImage
 export async function captureImage() {
-  window.clearInterval(icaoAppWC.grapFrameIntervalId);
+  // window.clearInterval(icaoAppWC.grapFrameIntervalId);
   console.log(icaoAppWC.grapFrameIntervalId);
 
   // icaoAppWC.grapFrameIntervalId = null;
@@ -707,7 +712,7 @@ export async function captureImage() {
       croppedimg.src = GetCropImageResult;
       console.log("calling stopvideo from captureImage()");
       stopVideoStream();
-      window.stream = null; // by Ali
+      // window.stream = null; // by Ali
 
       setIsLiveIcaoData(false); // by Ali
     } else {

@@ -28,6 +28,8 @@ function handleWorkerInterval() {
   if (!isIcaoCheckRunning && !isWorkerStopped) {
     if (canvas) {
       img.src = canvas.toDataURL();
+      // console.log(canvas.width)
+      // console.log(canvas.height)
       img.width = canvas.width;
       img.height = canvas.height;
 
