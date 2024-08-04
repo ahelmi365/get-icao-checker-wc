@@ -1,12 +1,5 @@
-import {
-  StartWorker,
-  StopWorker,
-  UpdateIsIcaoCheckRunning,
-} from "./ICAOWorker.js";
 import { t } from "../i18n/translate.js";
-// import "./index.js";
-console.log("========= this is utils ========");
-console.log(window.icaoAppWC);
+// console.log(window.icaoAppWC);
 // set the backendURL
 const webCamScriptDomainName = "http://localhost:9002";
 const backendURL = "http://localhost:9002";
@@ -184,9 +177,6 @@ export function enumerateDevices(cachedConnectedCamera) {
           const selecetedCameraIDFromLocalStorage =
             getSelectedCameraFromLocalStorage();
           try {
-            console.log(
-              "Calling connectCamera() from utils - enumerateDevices()"
-            );
             connectCamera(selecetedCameraIDFromLocalStorage);
           } catch (error) {
             console.log(error);
@@ -254,7 +244,7 @@ export function getWebCamDevice() {
 // ConnectCamera
 export function connectCamera(camera) {
   setIsLiveIcaoData(true);
-  console.log("INSIDE-connectCamera() is called");
+
   try {
     setIsPhotoCaptured(false);
     connectCameraBtnContainer.style.display = "none";
@@ -265,20 +255,20 @@ export function connectCamera(camera) {
       // {ICOAChecking: ƒ, IsServiceHealthy: ƒ, GetAndOpenDevice: ƒ, GetCropImage: ƒ}
 
       webCamDevice.onUpdateICAOCheck = function (IcaoResult) {
-        UpdateIsIcaoCheckRunning(false);
+        // UpdateIsIcaoCheckRunning(false);
         IcaoResult && IcaoResult.Success
           ? handleSuccessInICAOChecking(IcaoResult)
           : handleFailureInICAOChecking(IcaoResult);
       };
 
-      StopWorker();
+      // StopWorker();
     }
     pausedRequested = false;
-    console.log("calling StartVideo() from connect Camera");
+
     startVideo();
 
     if (icaoAppWC.isICAO) {
-      StartWorker();
+      // StartWorker();
     }
     setIsDeviceConnected(true);
 
@@ -302,7 +292,7 @@ let preferredResolutions = [
 ];
 
 export async function startVideo() {
-  console.log("Started the video()"); // by Ali
+  // console.log("Started the video()");
 
   // method load() resets the media element to its initial state
   // and begins the process of selecting a media source and loading the media in preparation for playback
@@ -312,7 +302,7 @@ export async function startVideo() {
   canvas.width = resolutionWidth;
   canvas.height = resolutionHeight; //video.videoHeight;//"400";//
 
-  video.style.display = "inline"; // by ali
+  video.style.display = "inline";
 
   // if ((<any>window).stream) {
   //   (<any>window).stream.getTracks().forEach(track => {
@@ -320,7 +310,7 @@ export async function startVideo() {
   //   });
   // }
 
-  stopCameraIndicatorInBrowser(); // by Ali
+  stopCameraIndicatorInBrowser();
 
   const videoSource = selectedCamera;
   const constraints = {
@@ -369,7 +359,7 @@ export async function startVideo() {
         console.error("Error playing video:", err);
       }
     };
-    UpdateIsIcaoCheckRunning(false);
+    // UpdateIsIcaoCheckRunning(false);
   } catch (error) {
     console.log("error from startVieo() function");
     console.log({ error });
@@ -391,13 +381,12 @@ export async function startVideo() {
       // console.log("window.stream running");
       grapFrame();
     }
-  }, 1000 / 30);
-  console.log(icaoAppWC.grapFrameIntervalId);
+  }, 1000);
 }
 // a function to stop video streaming from user's camera
 export function stopVideoStream() {
-  console.log("stopVideoStream() is called");
-  console.log(icaoAppWC.grapFrameIntervalId);
+  // console.log("stopVideoStream() is called");
+
   window.clearInterval(icaoAppWC.grapFrameIntervalId);
   // icaoAppWC.grapFrameIntervalId = null;
 
@@ -415,28 +404,83 @@ export function stopVideoStream() {
 
 // grapFrame
 export function grapFrame() {
+  // const startTime = performance.now();
   if (video) {
-    // by Ali
-    // canvas.width = video.videoWidth;
-    // canvas.height = "400"; //video.videoHeight;//"400";//
-
     canvas.width = resolutionWidth;
     canvas.height = resolutionHeight;
 
     const ctx = canvas.getContext("2d");
 
     if (!pausedRequested) {
-      // canvas.width = video.videoWidth;
-      // canvas.height = "400"; //video.videoHeight; //"400"; //
       canvas.width = resolutionWidth;
       canvas.height = resolutionHeight;
       ctx.drawImage(video, 0, 0, resolutionWidth, resolutionHeight);
+      if (icaoAppWC.isICAO) {
+        checkICAOResult(canvas);
+      }
     } else {
       pausedRequested = true;
     }
   }
+  const endTime = performance.now();
+  // console.log(`time diff = ${(endTime - startTime).toFixed(0)}ms`);
 }
 
+export function _grapFrame() {
+  // const startTime = performance.now();
+  if (video && canvas) {
+    // Set canvas size only if it has changed to avoid redundant operations
+    if (
+      canvas.width !== resolutionWidth ||
+      canvas.height !== resolutionHeight
+    ) {
+      canvas.width = resolutionWidth;
+      canvas.height = resolutionHeight;
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    if (!pausedRequested) {
+      ctx.drawImage(video, 0, 0, resolutionWidth, resolutionHeight);
+
+      // Schedule image processing for the next frame
+      requestAnimationFrame(() => checkICAOResult(canvas));
+    } else {
+      pausedRequested = true;
+    }
+  }
+  // const endTime = performance.now();
+  // console.log(`time diff = ${(endTime - startTime).toFixed(0)}ms`);
+}
+const getBase64FromCanvasBlob = (canvas) => {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64data = reader.result.split(",")[1];
+        resolve(base64data);
+      };
+      reader.readAsDataURL(blob);
+    }, "image/png");
+  });
+};
+// const icaoWorker = new Worker("../scripts/_icaoWorker.js");
+const _checkICAOResult = (canvas) => {
+  // const startTime = performance.now();
+
+  webCamDevice.ICOAChecking(canvas.toDataURL());
+
+  const endTime = performance.now();
+  // console.log(`time diff = ${(endTime - startTime).toFixed(0)}ms`);
+};
+const checkICAOResult = (canvas) => {
+  // const startTime = performance.now();
+  getBase64FromCanvasBlob(canvas).then((base64) =>
+    webCamDevice.ICOAChecking(base64)
+  );
+  const endTime = performance.now();
+  // console.log(`time diff = ${(endTime - startTime).toFixed(0)}ms`);
+};
 // HandleFailureInICAOChecking
 export function handleFailureInICAOChecking(IcaoResult) {
   displayICAOCheckingMessage(IcaoResult?.Message);
@@ -480,6 +524,7 @@ const fillFaceFeaturesWithNoGender = (parsedICAOResult) => {
 // HandleSuccessInICAOChecking
 
 export function handleSuccessInICAOChecking(IcaoResult) {
+  // console.log({ IcaoResult });
   displayICAOCheckingMessage("");
   setIsDeviceConnected(true);
   const parsedICAOResult = JSON.parse(IcaoResult.Result);
@@ -658,25 +703,22 @@ export async function reconnect() {
 }
 
 //CaptureImage
-export async function captureImage() {
-  // window.clearInterval(icaoAppWC.grapFrameIntervalId);
-  console.log(icaoAppWC.grapFrameIntervalId);
-
-  // icaoAppWC.grapFrameIntervalId = null;
+export async function _captureImage() {
+  const startTime = performance.now();
 
   pausedRequested = true;
-  StopWorker();
+  // StopWorker();
   video.pause();
 
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video, 0, 0, resolutionWidth, resolutionHeight);
 
   if (icaoAppWC.isICAO) {
-    const GetCropImageResult = await window
+    const cropedImageResult = await window
       .GetWebCameProvider()
       .GetCropImage(canvas.toDataURL("image/jpeg", 1.0));
 
-    if (GetCropImageResult) {
+    if (cropedImageResult) {
       croppedimg.onload = function () {
         canvas.width = croppedimg.naturalWidth;
         canvas.height = croppedimg.naturalHeight;
@@ -690,9 +732,9 @@ export async function captureImage() {
             croppedimg.naturalHeight
           );
 
-        video.style.display = "none"; // by ali
-        canvas.style.display = "none"; // by ali
-        croppedimg.style.display = "block"; // by ali
+        video.style.display = "none";
+        canvas.style.display = "none";
+        croppedimg.style.display = "block";
         croppedimg.animate(
           {
             opacity: 1,
@@ -709,12 +751,12 @@ export async function captureImage() {
         captureImageBtnContainer.style.display = "none";
         saveCroppedImageContainer.style.display = "flex";
       };
-      croppedimg.src = GetCropImageResult;
+      croppedimg.src = cropedImageResult;
       console.log("calling stopvideo from captureImage()");
       stopVideoStream();
-      // window.stream = null; // by Ali
+      // window.stream = null;
 
-      setIsLiveIcaoData(false); // by Ali
+      setIsLiveIcaoData(false);
     } else {
       displayICAOCheckingMessage("Cannot detect face");
       setIsPhotoCaptured(false);
@@ -723,9 +765,9 @@ export async function captureImage() {
     }
   } else {
     croppedimg.src = canvas.toDataURL("image/jpeg", 1.0);
-    video.style.display = "none"; // by ali
-    canvas.style.display = "none"; // by ali
-    croppedimg.style.display = "block"; // by ali
+    video.style.display = "none";
+    canvas.style.display = "none";
+    croppedimg.style.display = "block";
 
     icaoStatusInstructions.style.display = "none";
     connectCameraBtn.disabled = false;
@@ -735,10 +777,62 @@ export async function captureImage() {
     connectCameraBtnContainer.style.display = "flex";
     captureImageBtnContainer.style.display = "none";
     saveCroppedImageContainer.style.display = "flex";
-    window.stream = null; // by Ali
+    window.stream = null;
 
-    setIsLiveIcaoData(false); // by Ali
+    setIsLiveIcaoData(false);
   }
+  const endTime = performance.now();
+  console.log(
+    `BEFORE captureImage() diff = ${(endTime - startTime).toFixed(0)}ms`
+  );
+}
+
+const handleCroppedImage = () => {
+  video.style.display = "none";
+  canvas.style.display = "none";
+  croppedimg.style.display = "block";
+
+  icaoStatusInstructions.style.display = "none";
+  connectCameraBtn.disabled = false;
+  captureImageBtn.disabled = false;
+  setIsDeviceConnected(false);
+  setIsPhotoCaptured(true);
+  connectCameraBtnContainer.style.display = "flex";
+  captureImageBtnContainer.style.display = "none";
+  saveCroppedImageContainer.style.display = "flex";
+  stopVideoStream();
+  setIsLiveIcaoData(false);
+};
+export async function captureImage() {
+  // const startTime = performance.now();
+
+  pausedRequested = true;
+  video.pause();
+
+  if (icaoAppWC.isICAO) {
+    const base64 = await getBase64FromCanvasBlob(canvas);
+
+    const cropedImageResult = await window
+      .GetWebCameProvider()
+      .GetCropImage(base64);
+    if (cropedImageResult) {
+      croppedimg.src = cropedImageResult;
+      handleCroppedImage();
+    } else {
+      displayICAOCheckingMessage("Cannot detect face");
+      setIsPhotoCaptured(false);
+      connectCameraBtnContainer.style.display = "none";
+      captureImageBtnContainer.style.display = "flex";
+    }
+  } else {
+    getBase64FromCanvasBlob(canvas).then(
+      (base64) => (croppedimg.src = "data:image/jpeg;base64," + base64)
+    );
+
+    handleCroppedImage();
+  }
+  // const endTime = performance.now();
+  //console.log( `AFTER -- captureImage() diff = ${(endTime - startTime).toFixed(0)}ms`);
 }
 
 // SaveCaptureedImg
@@ -753,7 +847,7 @@ export function saveCaptureedImg(getImgSrc) {
   if (typeof getImgSrc === "function") {
     getImgSrc(croppedimg.src);
   }
-  console.log("calling stopvideo from saveCaptureedImg()");
+
   stopVideoStream();
   croppedimg.style.display = "none";
 }
@@ -824,7 +918,6 @@ export async function getICAOServiceConnectionState() {
         default:
       }
     }, 1000);
-    console.log(icaoAppWC.icaoServiceConnectionStateIntervalId);
   }
 }
 
@@ -839,9 +932,7 @@ export const connectwithCameraFromLocalStorage = () => {
   } else {
     avaliableCamerasSelect.value = selecetedCameraIDFromLocalStorage;
   }
-  console.log(
-    "Calling connectCamera() from utils - connectwithCameraFromLocalStorage()"
-  );
+
   connectCamera(selecetedCameraIDFromLocalStorage);
 };
 export function handleChangeInAvaliableCameras(selectedValue) {

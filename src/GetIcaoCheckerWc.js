@@ -93,7 +93,7 @@ export class GetIcaoCheckerWc extends LitElement {
 
   constructor() {
     super();
-    console.log("constructor version 1.6.1");
+    console.log("constructor version 1.6.2");
 
     this.isICAOWC = false;
     this.language = "en";
@@ -152,13 +152,8 @@ export class GetIcaoCheckerWc extends LitElement {
         utils,
         EnrolmentDevices,
       } = await import("./scripts/utils.js");
-      const { StopWorker } = await import("./scripts/ICAOWorker.js");
-      // const myUtils = (await import("./utils.js")).utils;
-      // TODO: check this one belwo
-      // setIsCheckingICAOServiceThread(false);
-      StopWorker();
+      // StopWorker();
       reestCashedArray();
-      console.log("calling stopvideo from openModalAndoadIcaoScripts()");
       stopVideoStream();
       clearICAOServiceThread(utils.CheckingICAOServiceThread);
 
