@@ -59,6 +59,8 @@ const setIsLiveIcaoData = (value) => {
   isLiveIcaoData = value;
 };
 
+let isCameraConnected = false;
+
 //#region Properties
 // const [avaliableCameras, setAvailableCameras] = useState({});
 const avaliableCameras = [];
@@ -172,6 +174,9 @@ export function enumerateDevices(cachedConnectedCamera) {
           const selecetedCameraIDFromLocalStorage =
             getSelectedCameraFromLocalStorage();
           try {
+            console.log(
+              "calling connectCamera() from utils on enumerateDevices()"
+            );
             connectCamera(selecetedCameraIDFromLocalStorage);
           } catch (error) {
             console.log(error);
@@ -291,7 +296,7 @@ let preferredResolutions = [
 ];
 
 export async function startVideo() {
-  // console.log("Started the video()");
+  console.log("Started the video()");
 
   // method load() resets the media element to its initial state
   // and begins the process of selecting a media source and loading the media in preparation for playback
@@ -303,34 +308,36 @@ export async function startVideo() {
 
   video.style.display = "inline";
 
-  stopCameraIndicatorInBrowser();
+  // stopCameraIndicatorInBrowser();
 
   const videoSource = selectedCamera;
   const constraints = {
     video: {
       deviceId: videoSource ? { exact: videoSource } : undefined,
+      width: resolutionWidth,
+      height: resolutionHeight,
     },
   };
   let mediaStream = null;
   try {
-    for (let resolution of preferredResolutions) {
-      constraints.video = {
-        ...constraints.video,
-        width: resolution.width,
-        height: resolution.height,
-      };
+    // for (let resolution of preferredResolutions) {
+    //   constraints.video = {
+    //     ...constraints.video,
+    //     width: resolution.width,
+    //     height: resolution.height,
+    //   };
 
-      try {
-        // console.log(resolution.width);
-        // console.log(resolution.height);
-        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-        // console.log({ resolution });
-        // console.log({ mediaStream });
-        break; // Break out of the loop if successful
-      } catch (error) {
-        // Continue trying with the next resolution
-      }
-    }
+    //   try {
+    //     // console.log(resolution.width);
+    //     // console.log(resolution.height);
+    //     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+    //     // console.log({ resolution });
+    //     // console.log({ mediaStream });
+    //     break; // Break out of the loop if successful
+    //   } catch (error) {
+    //     // Continue trying with the next resolution
+    //   }
+    // }
     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
 
     window.stream = mediaStream;
@@ -398,7 +405,7 @@ export function stopVideoStream() {
 }
 
 // grapFrame
-export function grapFrame() {
+export function _grapFrame() {
   // const startTime = performance.now();
   if (video) {
     canvas.width = resolutionWidth;
@@ -407,8 +414,8 @@ export function grapFrame() {
     const ctx = canvas.getContext("2d");
 
     if (!pausedRequested) {
-      canvas.width = resolutionWidth;
-      canvas.height = resolutionHeight;
+      // canvas.width = resolutionWidth;
+      // canvas.height = resolutionHeight;
       ctx.drawImage(video, 0, 0, resolutionWidth, resolutionHeight);
       if (icaoAppWC.isICAO) {
         checkICAOResult(canvas);
@@ -417,11 +424,13 @@ export function grapFrame() {
       pausedRequested = true;
     }
   }
-  const endTime = performance.now();
-  // console.log(`time diff = ${(endTime - startTime).toFixed(0)}ms`);
+  // const endTime = performance.now();
+  // console.log(
+  //   `grapFrame() => time diff = ${(endTime - startTime).toFixed(0)}ms`
+  // );
 }
 
-export function _grapFrame() {
+export function grapFrame() {
   // const startTime = performance.now();
   if (video && canvas) {
     // Set canvas size only if it has changed to avoid redundant operations
@@ -439,7 +448,9 @@ export function _grapFrame() {
       ctx.drawImage(video, 0, 0, resolutionWidth, resolutionHeight);
 
       // Schedule image processing for the next frame
-      requestAnimationFrame(() => checkICAOResult(canvas));
+      if (icaoAppWC.isICAO) {
+        requestAnimationFrame(() => checkICAOResult(canvas));
+      }
     } else {
       pausedRequested = true;
     }
@@ -448,12 +459,18 @@ export function _grapFrame() {
   // console.log(`time diff = ${(endTime - startTime).toFixed(0)}ms`);
 }
 const getBase64FromCanvasBlob = (canvas) => {
+  // const startTime = performance.now();
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64data = reader.result.split(",")[1];
+
         resolve(base64data);
+        // const endTime = performance.now();
+        // console.log(
+        //   `getBase64FromCanvasBlob() => diff time = ${endTime - startTime}`
+        // );
       };
       reader.readAsDataURL(blob);
     }, "image/png");
@@ -468,11 +485,14 @@ const _checkICAOResult = (canvas) => {
   const endTime = performance.now();
   // console.log(`time diff = ${(endTime - startTime).toFixed(0)}ms`);
 };
+
+let base64FromCanvas = "";
 const checkICAOResult = (canvas) => {
   // const startTime = performance.now();
-  getBase64FromCanvasBlob(canvas).then((base64) =>
-    webCamDevice.ICOAChecking(base64)
-  );
+  getBase64FromCanvasBlob(canvas).then((base64) => {
+    base64FromCanvas = base64;
+    webCamDevice.ICOAChecking(base64);
+  });
   const endTime = performance.now();
   // console.log(`time diff = ${(endTime - startTime).toFixed(0)}ms`);
 };
@@ -724,7 +744,7 @@ function handleConnectionSuccess(result) {
 
 //CaptureImage
 export async function _captureImage() {
-  const startTime = performance.now();
+  // const startTime = performance.now();
 
   pausedRequested = true;
   // StopWorker();
@@ -801,13 +821,14 @@ export async function _captureImage() {
 
     setIsLiveIcaoData(false);
   }
-  const endTime = performance.now();
-  console.log(
-    `BEFORE captureImage() diff = ${(endTime - startTime).toFixed(0)}ms`
-  );
+  // const endTime = performance.now();
+  // console.log(
+  //   `Old captureImage() => diff = ${(endTime - startTime).toFixed(0)}ms`
+  // );
 }
 
 const handleCroppedImage = () => {
+  stopVideoStream();
   video.style.display = "none";
   canvas.style.display = "none";
   croppedimg.style.display = "block";
@@ -820,7 +841,6 @@ const handleCroppedImage = () => {
   connectCameraBtnContainer.style.display = "flex";
   captureImageBtnContainer.style.display = "none";
   saveCroppedImageContainer.style.display = "flex";
-  stopVideoStream();
   setIsLiveIcaoData(false);
 };
 export async function captureImage() {
@@ -828,13 +848,13 @@ export async function captureImage() {
 
   pausedRequested = true;
   video.pause();
-
+  stopCameraIndicatorInBrowser();
   if (icaoAppWC.isICAO) {
-    const base64 = await getBase64FromCanvasBlob(canvas);
+    // const base64 = await getBase64FromCanvasBlob(canvas);
 
     const cropedImageResult = await window
       .GetWebCameProvider()
-      .GetCropImage(base64);
+      .GetCropImage(base64FromCanvas);
     if (cropedImageResult) {
       croppedimg.src = cropedImageResult;
       handleCroppedImage();
@@ -848,11 +868,12 @@ export async function captureImage() {
     getBase64FromCanvasBlob(canvas).then(
       (base64) => (croppedimg.src = "data:image/jpeg;base64," + base64)
     );
+    // croppedimg.src = "data:image/jpeg;base64," + base64FromCanvas;
 
     handleCroppedImage();
   }
   // const endTime = performance.now();
-  //console.log( `AFTER -- captureImage() diff = ${(endTime - startTime).toFixed(0)}ms`);
+  // console.log(`captureImage() => diff = ${(endTime - startTime).toFixed(0)}ms`);
 }
 
 // SaveCaptureedImg
@@ -913,6 +934,9 @@ export async function getICAOServiceConnectionState() {
             connectCameraBtn.disabled = false;
             // reconnect camera if not connected
             if (!isICAOSeriveActive) {
+              // console.log(
+              //   "calling connectCamera() from utils on getICAOServiceConnectionState()"
+              // );
               connectCamera(cachedCamera);
               setIsICAOSeriveActive(true);
             }
@@ -959,7 +983,9 @@ export const connectwithCameraFromLocalStorage = () => {
   } else {
     avaliableCamerasSelect.value = selecetedCameraIDFromLocalStorage;
   }
-
+  console.log(
+    "calling connectCamera() from utils on connectwithCameraFromLocalStorage()"
+  );
   connectCamera(selecetedCameraIDFromLocalStorage);
 };
 export function handleChangeInAvaliableCameras(selectedValue) {
