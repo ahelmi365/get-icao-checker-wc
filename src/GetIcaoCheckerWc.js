@@ -50,7 +50,7 @@ export class GetIcaoCheckerWc extends LitElement {
 
   constructor() {
     super();
-    console.log("constructor version 1.7.0");
+    console.log("constructor version 1.7.1");
 
     this.isICAOWC = false;
     this.language = "en";

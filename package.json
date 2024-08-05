@@ -3,7 +3,7 @@
   "description": "Webcomponent get-icao-checker-wc following open-wc recommendations",
   "license": "MIT",
   "author": "get-icao-checker-wc",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "type": "module",
   "main": "index.js",
   "module": "index.js",
