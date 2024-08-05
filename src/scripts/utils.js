@@ -106,7 +106,9 @@ export const setCachedCamera = (value) => {
 };
 // const [selectedCamera, setSelectedCamera] = useState();
 export let selectedCamera;
-const setSelectedCamera = () => {};
+const setSelectedCamera = (selectedValue) => {
+  selectedCamera = selectedValue;
+};
 // const videoRef = useRef(null);
 export let videoRef;
 //#endregion
@@ -174,9 +176,6 @@ export function enumerateDevices(cachedConnectedCamera) {
           const selecetedCameraIDFromLocalStorage =
             getSelectedCameraFromLocalStorage();
           try {
-            console.log(
-              "calling connectCamera() from utils on enumerateDevices()"
-            );
             connectCamera(selecetedCameraIDFromLocalStorage);
           } catch (error) {
             console.log(error);
@@ -983,9 +982,6 @@ export const connectwithCameraFromLocalStorage = () => {
   } else {
     avaliableCamerasSelect.value = selecetedCameraIDFromLocalStorage;
   }
-  console.log(
-    "calling connectCamera() from utils on connectwithCameraFromLocalStorage()"
-  );
   connectCamera(selecetedCameraIDFromLocalStorage);
 };
 export function handleChangeInAvaliableCameras(selectedValue) {
@@ -1132,8 +1128,8 @@ export function removeFullscreenStyles() {
 
 // function to store the selected camera in local storage:
 export const addSelectedCameraToLocalStorage = (selecetedCameraID) => {
-  const firstAvailableCamera = Object.values(avaliableCameras[0])[0];
-  if (selecetedCameraID === "-1") {
+  if (selecetedCameraID === "-1" && avaliableCameras.length > 0) {
+    const firstAvailableCamera = Object.values(avaliableCameras[0])[0];
     localStorage.setItem("icaoSelectedCamera", firstAvailableCamera);
   } else {
     localStorage.setItem("icaoSelectedCamera", selecetedCameraID);

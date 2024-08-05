@@ -332,6 +332,23 @@ p.icao-reconnect-instrcutions {
 .data-conatiner .capture-image-btn {
   grid-area: 9/4/11/6;
   align-self: center;
+
+ 
+}
+.data-conatiner .connect-camera-btn:hover,
+.data-conatiner .capture-image-btn:hover {
+ 
+
+  button{
+    cursor: pointer;
+  }
+
+  button:hover{
+    transform:scale(1.15);
+    transition: all ease 0.5s;
+  }
+
+ 
 }
 
 .data-conatiner .save-captured-image-btn button {
@@ -398,7 +415,9 @@ p.icao-reconnect-instrcutions {
   /* justify-content: center; */
   /* align-items: center; */
 }
-
+.toggle-full-screen-btn{
+  line-height:0;
+}
 .toggle-full-screen button,
 .save-captured-image-btn button {
   border: none;
@@ -530,10 +549,15 @@ p.icao-reconnect-instrcutions {
 
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.9);
+  cursor: pointer;
 
   /* box-shadow: -5px 5px 5px 1px; */
 }
 
+.icao-card-container:hover {
+  transform:scale(1.15);
+  transition:all ease 0.5s;
+}
 .icao-card-container span.tooltip-text {
   visibility: hidden;
   width: 250px;
@@ -546,7 +570,7 @@ p.icao-reconnect-instrcutions {
   z-index: 1;
   opacity: 0;
   transition: opacity 0.3s;
-  font-size: 0.65;
+  font-size: 0.85rem;
 }
 .icao-card-container span.tooltip-right-text {
   left: 60px;
@@ -603,7 +627,7 @@ p.icao-reconnect-instrcutions {
     } */
 
 .icao-green-background {
-  background-color: #58bd7d;
+  background-color: #14ac4b;
   /* border: 3px solid #c8e7d0; */
   border: 3px solid rgba(200, 231, 208, 0.9);
 }
@@ -613,9 +637,9 @@ p.icao-reconnect-instrcutions {
     } */
 
 .icao-red-background {
-  background-color: #ff6838;
+  background-color: #d03e10;
   /* border: 3px solid #f5c3ac; */
-  border: 3px solid rgba(245, 195, 172, 0.5);
+  border: 3px solid rgba(245, 195, 172, 0.9);
 }
 
 .icao-black-background {
@@ -627,7 +651,7 @@ p.icao-reconnect-instrcutions {
 }
 
 .green-font {
-  color: green;
+  color: #14ac4b;
 }
 .white-font {
   color: white;
