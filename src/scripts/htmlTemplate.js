@@ -570,7 +570,7 @@ p.icao-reconnect-instrcutions {
   z-index: 1;
   opacity: 0;
   transition: opacity 0.3s;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 .icao-card-container span.tooltip-right-text {
   left: 60px;
