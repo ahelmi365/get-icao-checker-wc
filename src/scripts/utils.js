@@ -913,7 +913,6 @@ export async function getICAOServiceConnectionState() {
         typeof serviceProxyForWebCam == "undefined" ||
         window.serviceProxyForWebCam === undefined
       ) {
-        console.log(window.serviceProxyForWebCam);
         icaoStatusInstructions.style.display = "flex";
         connectCameraBtn.disabled = true;
         captureImageBtn.disabled = true;
