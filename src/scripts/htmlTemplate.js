@@ -331,9 +331,7 @@ p.icao-reconnect-instrcutions {
 .data-conatiner .connect-camera-btn,
 .data-conatiner .capture-image-btn {
   grid-area: 9/4/11/6;
-  align-self: center;
-
- 
+  align-self: center; 
 }
 .data-conatiner .connect-camera-btn:hover,
 .data-conatiner .capture-image-btn:hover {
@@ -622,24 +620,19 @@ p.icao-reconnect-instrcutions {
   margin: 10px 0;
 }
 
-/* .icao-green-background {
-      background-color: rgb(51, 102, 0);
-    } */
-
 .icao-green-background {
-  background-color: #14ac4b;
   /* border: 3px solid #c8e7d0; */
   border: 3px solid rgba(200, 231, 208, 0.9);
+  background: rgb(20,172,71);
+  background: linear-gradient(170deg, rgba(20,172,71,1) 4%, rgba(0,255,73,1) 90%);
 }
 
-/* .icao-red-background {
-      background-color: #ff0000;
-    } */
 
 .icao-red-background {
-  background-color: #d03e10;
-  /* border: 3px solid #f5c3ac; */
-  border: 3px solid rgba(245, 195, 172, 0.9);
+  /* background-color: #d03e10;*/
+  border: 3px solid rgba(245, 195, 172, 0.9); 
+  background: rgb(208,16,16);
+background: linear-gradient(180deg, rgba(208,16,16,1) 19%, rgba(255,80,80,1) 71%);
 }
 
 .icao-black-background {
