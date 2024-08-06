@@ -92,6 +92,7 @@ npm i get-icao-checker-wc
              openModalElmId="open-icao-modal"
              savedImageElmId="icao-result-image"
              ref={icaoCheckerWCRef}
+             language="en"
            ></get-icao-checker-wc>
          </div>
        </div>
